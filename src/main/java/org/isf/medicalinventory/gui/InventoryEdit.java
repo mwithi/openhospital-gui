@@ -87,7 +87,7 @@ import org.isf.medstockmovtype.manager.MedicalDsrStockMovementTypeBrowserManager
 import org.isf.medstockmovtype.model.MovementType;
 import org.isf.menu.manager.Context;
 import org.isf.menu.manager.UserBrowsingManager;
-import org.isf.stat.dto.JasperReportResultDto;
+import org.isf.stat.gui.report.GenericReportPharmaceuticalInventory;
 import org.isf.stat.manager.JasperReportsManager;
 import org.isf.supplier.manager.SupplierBrowserManager;
 import org.isf.supplier.model.Supplier;
@@ -104,8 +104,6 @@ import org.isf.utils.jobjects.TextPrompt.Show;
 import org.isf.utils.time.TimeTools;
 import org.isf.ward.manager.WardBrowserManager;
 import org.isf.ward.model.Ward;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class InventoryEdit extends ModalJFrame {
 
@@ -881,28 +879,18 @@ public class InventoryEdit extends ModalJFrame {
 		printButton.setEnabled(true);
 
 		printButton.addActionListener(e -> {
-			if (inventory == null || inventory.getId() <= 0) {
+			if (inventory == null || inventory.getId() == 0 || inventory.getId() <= 0) {
 				MessageDialog.info(this, "angal.inventory.pleasesavebeforprinting");
 				return;
 			}
 
-			if (InventoryStatus.done.name().equals(inventory.getStatus())) {
+			if (!InventoryStatus.done.name().equals(inventory.getStatus())) {
 				int printQtyReal = 0;
-				int response = MessageDialog.yesNo(this, "angal.inventorywardedit.askforrealquantityempty");
+				int response = MessageDialog.yesNo(this, "angal.inventory.askforrealquantityempty");
 				if (response == JOptionPane.YES_OPTION) {
 					printQtyReal = 1;
 				}
-
-				try {
-					JasperReportResultDto reportResult = jasperReportsManager.getInventoryReportPdf(inventory, "Inventory", printQtyReal);
-					if (reportResult != null) {
-						MessageDialog.info(this, "angal.inventory.print.success.msg");
-					} else {
-						MessageDialog.error(this, "angal.inventory.printing.error.msg");
-					}
-				} catch (OHServiceException ex) {
-					MessageDialog.error(this, "angal.inventory.printing.error.msg");
-				}
+				new GenericReportPharmaceuticalInventory(inventory, "Inventory", printQtyReal);
 			} else {
 				MessageDialog.info(this, "angal.inventory.pleasesavebeforprinting");
 			}
