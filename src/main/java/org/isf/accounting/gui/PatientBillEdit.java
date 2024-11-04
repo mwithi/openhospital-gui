@@ -107,8 +107,7 @@ import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
 import com.github.lgooddatepicker.zinternaltools.TimeChangeEvent;
 
 /**
- * Create a single Patient Bill
- * it affects tables BILLS, BILLITEMS and BILLPAYMENTS
+ * Create a single Patient Bill which affects tables BILLS, BILLITEMS and BILLPAYMENTS
  *
  * @author Mwithi
  */
@@ -558,8 +557,7 @@ public class PatientBillEdit extends JDialog implements SelectionListener {
 			MessageDialog.warning(this,
 							MessageBundle.formatMessage("angal.newbill.somepricesnotfound.fmt.msg", String.join(", ", notFoundPriceList)));
 		} else if (!changedPriceList.isEmpty()) {
-			int ok = MessageDialog.yesNo(this, MessageBundle.formatMessage(
-							"angal.newbill.somepriceshavebeenchangeddoyouwanttoupdatetheitemsprices.fmg.msg", String.join(", ", changedPriceList)));
+			int ok = MessageDialog.yesNo(this, "angal.newbill.somepriceshavebeenchangeddoyouwanttoupdatetheitemsprices.fmt.msg", String.join(", ", changedPriceList));
 			if (ok == JOptionPane.OK_OPTION) {
 				updatePrices();
 			}
@@ -721,6 +719,8 @@ public class PatientBillEdit extends JDialog implements SelectionListener {
 				thisBill.setPriceList(selectedPricelist);
 				thisBill.setIsList(true);
 				setCurrencyCodeFromList(selectedPricelist);
+				setPriceListArray();
+				checkBill();
 				updateGUI();
 			});
 		}
