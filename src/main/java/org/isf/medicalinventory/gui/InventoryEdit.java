@@ -935,7 +935,7 @@ public class InventoryEdit extends ModalJFrame {
 
 		printButton.addActionListener(e -> {
 			int printQtyReal = 0;
-			int response = MessageDialog.yesNo(this, "angal.inventory.askforrealquantityempty");
+			int response = MessageDialog.yesNo(this, "angal.inventory.askforrealquantityempty.msg");
 			if (response == JOptionPane.YES_OPTION) {
 				printQtyReal = 1;
 			}
