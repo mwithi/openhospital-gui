@@ -34,9 +34,9 @@ public class GenericReportPharmaceuticalInventory extends DisplayReport {
 	private static final Logger LOGGER = LoggerFactory.getLogger(GenericReportPharmaceuticalInventory.class);
 	private JasperReportsManager jasperReportsManager = Context.getApplicationContext().getBean(JasperReportsManager.class);
 
-	public GenericReportPharmaceuticalInventory(MedicalInventory medicalInventory, String jasperFileName, int printQtyReal) {
+	public GenericReportPharmaceuticalInventory(MedicalInventory medicalInventory, String jasperFileName, int printRealQty) {
 		try {
-			JasperReportResultDto jasperReportResultDto = jasperReportsManager.getInventoryReportPdf(medicalInventory, jasperFileName, printQtyReal);
+			JasperReportResultDto jasperReportResultDto = jasperReportsManager.getInventoryReportPdf(medicalInventory, jasperFileName, printRealQty);
 			showReport(jasperReportResultDto);
 		} catch (Exception e) {
 			LOGGER.error("", e);

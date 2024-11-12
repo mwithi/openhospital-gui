@@ -934,12 +934,12 @@ public class InventoryEdit extends ModalJFrame {
 		printButton.setEnabled(true);
 
 		printButton.addActionListener(e -> {
-			int printQtyReal = 0;
+			int printRealQty = 0;
 			int response = MessageDialog.yesNo(this, "angal.inventory.askforrealquantityempty.msg");
 			if (response == JOptionPane.YES_OPTION) {
-				printQtyReal = 1;
+				printRealQty = 1;
 			}
-			new GenericReportPharmaceuticalInventory(inventory, "Inventory", printQtyReal);
+			new GenericReportPharmaceuticalInventory(inventory, "Inventory", printRealQty);
 		});
 
 		return printButton;

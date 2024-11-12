@@ -25,7 +25,7 @@
 	<parameter name="inventoryDate" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="inventoryReference" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="inventoryStatus" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="printQtyReal" class="java.lang.Integer" isForPrompting="false"/>
+	<parameter name="printRealQty" class="java.lang.Integer" isForPrompting="false"/>
 	<parameter name="PATH_LOGO" class="java.lang.String">
 		<defaultValueExpression><![CDATA["./rsc/images/"]]></defaultValueExpression>
 	</parameter>
@@ -34,7 +34,7 @@
 			 FROM ((`oh_medicaldsrinventoryrow` join `oh_medicaldsrinventory` ON MINVTR_INVT_ID=MINVT_ID)
 			join `oh_medicaldsr` on MINVTR_MDSR_ID=MDSR_ID)
 			left join `oh_medicaldsrlot` on MINVTR_LT_ID_A=LT_ID_A
-			where MINVTR_INVT_ID =  $P{inventoryId} ORDER BY MDSR_DESC asc]]>
+			where MINVTR_INVT_ID = $P{inventoryId} ORDER BY MDSR_DESC asc]]>
 	</queryString>
 	<field name="LT_DUE_DATE" class="java.lang.String"/>
 	<field name="MDSR_CODE" class="java.lang.String"/>
@@ -135,7 +135,7 @@
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$R{PrincipalWardInventory}+ ":" + $P{inventoryId}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$R{MainStoreInventoryID}+ ":" + $P{inventoryId}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField-13" x="0" y="48" width="273" height="22" uuid="c36a0f89-2260-4f94-83f3-5ae60fe10808"/>
@@ -199,7 +199,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$R{WardCode}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$R{LotCode}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
 				<reportElement key="textField-33" x="290" y="0" width="80" height="20" uuid="4d84a530-45ab-4b4f-ab82-ea60e90efd5a"/>
@@ -282,7 +282,7 @@
 					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[($P{printQtyReal}.intValue() == 1 ? "" : new DecimalFormat("0").format($F{MINVTR_REAL_QTY}) + "")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($P{printRealQty}.intValue() == 1 ? "" : new DecimalFormat("0").format($F{MINVTR_REAL_QTY}) + "")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement key="textField-25" x="290" y="0" width="80" height="23" uuid="30872397-c9dc-49eb-a3e3-746e5f63d17b"/>
