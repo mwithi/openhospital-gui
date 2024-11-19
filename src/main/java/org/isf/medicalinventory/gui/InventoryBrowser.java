@@ -72,6 +72,7 @@ import org.springframework.data.domain.Page;
 
 public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 
+	private static final long serialVersionUID = 1L;
 	private GoodDateChooser jCalendarTo;
 	private GoodDateChooser jCalendarFrom;
 	private LocalDateTime dateFrom = TimeTools.getNow();
@@ -97,7 +98,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 	private JLabel statusLabel;
 	JButton next;
 	JButton previous;
-	JComboBox pagesCombo = new JComboBox();
+	JComboBox<Integer> pagesCombo = new JComboBox<>();
 	JLabel under = new JLabel("/ 0 Page");
 	private static int PAGE_SIZE = 50;
 	private int startIndex = 0;
@@ -377,6 +378,11 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 				MessageDialog.error(null, "angal.inventory.cancelednoteditable.msg");
 				return;
 			}
+			
+			if (inventory.getStatus().equals(InventoryStatus.done.toString())) {
+				MessageDialog.error(null, "angal.inventory.donenoteditable.msg");
+				return;
+			}
 			InventoryEdit inventoryEdit = new InventoryEdit(inventory,"update");
 			InventoryEdit.addInventoryListener(InventoryBrowser.this);
 			inventoryEdit.showAsModal(InventoryBrowser.this);
@@ -475,7 +481,18 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 					if (e.getValueIsAdjusting()) {
 						int[] selectedRows = jTableInventory.getSelectedRows();
 						if (selectedRows.length == 1) {
-							jButtonEdit.setEnabled(true);
+							int selectedRow = jTableInventory.getSelectedRow();
+							MedicalInventory inventory = inventoryList.get(selectedRow);
+							if (inventory.getStatus().equals(InventoryStatus.canceled.toString()) || 
+											inventory.getStatus().equals(InventoryStatus.done.toString())) {
+								jButtonEdit.setEnabled(false);
+								jButtonDelete.setEnabled(false);
+							} else {
+								jButtonEdit.setEnabled(true);
+								jButtonDelete.setEnabled(true);
+								
+							}
+							jButtonView.setEnabled(true);
 							jButtonView.setEnabled(true);
 							jButtonDelete.setEnabled(true);
 						} else {
