@@ -28,6 +28,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -52,6 +53,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -84,14 +86,17 @@ import org.isf.medicalinventory.model.MedicalInventory;
 import org.isf.medicalinventory.model.MedicalInventoryRow;
 import org.isf.medicals.manager.MedicalBrowsingManager;
 import org.isf.medicals.model.Medical;
+import org.isf.medicalstock.manager.MovBrowserManager;
 import org.isf.medicalstock.manager.MovStockInsertingManager;
 import org.isf.medicalstock.model.Lot;
+import org.isf.medicalstock.model.Movement;
 import org.isf.medstockmovtype.manager.MedicalDsrStockMovementTypeBrowserManager;
 import org.isf.medstockmovtype.model.MovementType;
+import org.isf.medtype.manager.MedicalTypeBrowserManager;
+import org.isf.medtype.model.MedicalType;
 import org.isf.menu.manager.Context;
 import org.isf.menu.manager.UserBrowsingManager;
 import org.isf.stat.gui.report.GenericReportPharmaceuticalInventory;
-import org.isf.stat.manager.JasperReportsManager;
 import org.isf.supplier.manager.SupplierBrowserManager;
 import org.isf.supplier.model.Supplier;
 import org.isf.utils.db.NormalizeString;
@@ -200,7 +205,6 @@ public class InventoryEdit extends ModalJFrame {
 			GeneralData.LOTWITHCOST };
 	private MedicalInventory inventory = null;
 	private JRadioButton specificRadio;
-	private JRadioButton allRadio;
 	private JLabel dateInventoryLabel;
 	private JTextField codeTextField;
 	private String code = null;
@@ -210,6 +214,7 @@ public class InventoryEdit extends ModalJFrame {
 	private JLabel chargeTypeLabel;
 	private JLabel dischargeTypeLabel;
 	private JLabel supplierLabel;
+	private JLabel addProductLabel;
 	private JLabel destinationLabel;
 	private JTextField referenceTextField;
 	private JTextField jTextFieldEditor;
@@ -222,6 +227,16 @@ public class InventoryEdit extends ModalJFrame {
 	private Supplier supplier = null;
 	private Ward destination = null;
 	private String newReference = null;
+	private JButton selectButton;
+	private JFrame frame;
+	private JPanel mainPanel;
+	private JRadioButton radioButtonAll;
+	private JRadioButton radioOnlyNonZero;
+	private JRadioButton radioWithMovement;
+	private JButton jButtonCancel;
+	private JButton jButtonOk;
+	private MedicalType medicalTypeSelected;
+	private JComboBox<MedicalType> medicalTypeComboBox;
 	private MedicalInventoryManager medicalInventoryManager = Context.getApplicationContext().getBean(MedicalInventoryManager.class);
 	private MedicalInventoryRowManager medicalInventoryRowManager = Context.getApplicationContext().getBean(MedicalInventoryRowManager.class);
 	private MedicalBrowsingManager medicalBrowsingManager = Context.getApplicationContext().getBean(MedicalBrowsingManager.class);
@@ -229,8 +244,9 @@ public class InventoryEdit extends ModalJFrame {
 	private MedicalDsrStockMovementTypeBrowserManager movTypeManager = Context.getApplicationContext().getBean(MedicalDsrStockMovementTypeBrowserManager.class);
 	private SupplierBrowserManager supplierManager = Context.getApplicationContext().getBean(SupplierBrowserManager.class);
 	private WardBrowserManager wardManager = Context.getApplicationContext().getBean(WardBrowserManager.class);
-	private JasperReportsManager jasperReportsManager = Context.getApplicationContext().getBean(JasperReportsManager.class);
-
+	private MedicalTypeBrowserManager medicalTypeManager = Context.getApplicationContext().getBean(MedicalTypeBrowserManager.class);
+	private MovBrowserManager movBrowserManager = Context.getApplicationContext().getBean(MovBrowserManager.class);
+	
 	public InventoryEdit() {
 		mode = "new";
 		initComponents();
@@ -294,7 +310,6 @@ public class InventoryEdit extends ModalJFrame {
 			referenceTextField.setEditable(false);
 			jCalendarInventory.setEnabled(false);
 			specificRadio.setEnabled(false);
-			allRadio.setEnabled(false);
 			chargeCombo.setEnabled(false);
 			dischargeCombo.setEnabled(false);
 			supplierCombo.setEnabled(false);
@@ -310,7 +325,6 @@ public class InventoryEdit extends ModalJFrame {
 			referenceTextField.setEditable(true);
 			jCalendarInventory.setEnabled(true);
 			specificRadio.setEnabled(true);
-			allRadio.setEnabled(true);
 			chargeCombo.setEnabled(true);
 			dischargeCombo.setEnabled(true);
 			supplierCombo.setEnabled(true);
@@ -426,15 +440,18 @@ public class InventoryEdit extends ModalJFrame {
 			gbc_codeTextField.gridx = 1;
 			gbc_codeTextField.gridy = 3;
 			panelHeader.add(getCodeTextField(), gbc_codeTextField);
-			GridBagConstraints gbc_allRadio = new GridBagConstraints();
-			gbc_allRadio.anchor = GridBagConstraints.EAST;
-			gbc_allRadio.insets = new Insets(0, 0, 0, 5);
-			gbc_allRadio.gridx = 2;
-			gbc_allRadio.gridy = 3;
-			panelHeader.add(getAllRadio(), gbc_allRadio);
-			ButtonGroup group = new ButtonGroup();
-			group.add(specificRadio);
-			group.add(allRadio);
+			GridBagConstraints gbc_addProduct = new GridBagConstraints();
+			gbc_addProduct.anchor = GridBagConstraints.EAST;
+			gbc_addProduct.insets = new Insets(0, 0, 0, 5);
+			gbc_addProduct.gridx = 2;
+			gbc_addProduct.gridy = 3;
+			panelHeader.add(getAddProductLabel(), gbc_addProduct);
+			GridBagConstraints gbc_selectButton = new GridBagConstraints();
+			gbc_selectButton.anchor = GridBagConstraints.WEST;
+			gbc_selectButton.insets = new Insets(0, 0, 0, 5);
+			gbc_selectButton.gridx = 3;
+			gbc_selectButton.gridy = 3;
+			panelHeader.add(getSelectedButton(), gbc_selectButton);
 		}
 		return panelHeader;
 	}
@@ -486,6 +503,52 @@ public class InventoryEdit extends ModalJFrame {
 		return jCalendarInventory;
 	}
 
+	private JButton getSelectedButton() {
+		if (selectButton == null) {
+			selectButton = new JButton(MessageBundle.getMessage("angal.common.select.btn"));
+			selectButton.setMnemonic(MessageBundle.getMnemonic("angal.common.select.btn.key"));
+			selectButton.addActionListener(actionEvent -> {
+				specificRadio.setSelected(false);
+		        mainPanel = new JPanel();
+		        mainPanel.setLayout(new BorderLayout(10, 10));
+		        
+		        JPanel leftPanel = new JPanel();
+		        leftPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 20));
+		        leftPanel.setLayout(new GridLayout(3,1));
+		        leftPanel.add(new JLabel(MessageBundle.getMessage("angal.inventoryrow.medicaltype.txt")));
+		        leftPanel.add(getJComboMedicalType());
+		        
+		        ButtonGroup radioGroup = new ButtonGroup();
+		        radioGroup.add(radioButtonAll);
+		        radioGroup.add(radioOnlyNonZero);
+		        radioGroup.add(radioWithMovement);
+		        
+		        JPanel rightPanel = new JPanel();
+		        rightPanel.setLayout(new GridLayout(3, 1, 5, 5));
+		        rightPanel.add(getAllRadioButton());
+		        rightPanel.add(getMedicalWithNonZeroQuatityRadioButton());
+		        rightPanel.add(getMedicalWithMovementRadioButton());
+		        
+		        JPanel bottomPanel = new JPanel();
+		        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		        bottomPanel.add(getOkButton());
+		        bottomPanel.add(getCancelButton());
+		        
+		        mainPanel.add(leftPanel, BorderLayout.WEST);
+		        mainPanel.add(rightPanel, BorderLayout.EAST);
+		        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+		        
+		        frame = new JFrame();
+		        frame.add(mainPanel);
+		        frame.setSize(450, 200);
+		        frame.setTitle(MessageBundle.getMessage("angal.inventoryrow.lotinformation.title"));
+		        frame.setLocationRelativeTo(null);
+		        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		        frame.setVisible(true);
+			});
+		}
+		return selectButton;
+	}
 	private JButton getSaveButton() {
 		saveButton = new JButton(MessageBundle.getMessage("angal.common.save.btn"));
 		saveButton.setMnemonic(MessageBundle.getMnemonic("angal.common.save.btn.key"));
@@ -613,13 +676,11 @@ public class InventoryEdit extends ModalJFrame {
 										confirmButton.setEnabled(false);
 									}
 									if (areAllMedicalsInInventory()) {
-										allRadio.setSelected(true);
 										specificRadio.setSelected(false);
 										codeTextField.setEnabled(false);
 									} else {
 										specificRadio.setSelected(true);
 										codeTextField.setEnabled(true);
-										allRadio.setSelected(false);
 									}
 									resetVariable();
 								} else {
@@ -638,13 +699,11 @@ public class InventoryEdit extends ModalJFrame {
 									confirmButton.setEnabled(false);
 								}
 								if (areAllMedicalsInInventory()) {
-									allRadio.setSelected(true);
 									specificRadio.setSelected(false);
 									codeTextField.setEnabled(false);
 								} else {
 									specificRadio.setSelected(true);
 									codeTextField.setEnabled(true);
-									allRadio.setSelected(false);
 								}
 								resetVariable();
 							} else {
@@ -701,11 +760,9 @@ public class InventoryEdit extends ModalJFrame {
 						fireInventoryUpdated();
 						validateButton.setEnabled(true);
 						if (areAllMedicalsInInventory()) {
-							allRadio.setSelected(true);
 							specificRadio.setSelected(false);
 						} else {
 							specificRadio.setSelected(true);
-							allRadio.setSelected(false);
 						}
 					}
 				}
@@ -965,8 +1022,8 @@ public class InventoryEdit extends ModalJFrame {
 				}
 				// validate inventory
 				try {
-					medicalInventoryManager.validateMedicalInventoryRow(inventory, inventoryRowSearchList);
 					String status = InventoryStatus.validated.toString();
+					medicalInventoryManager.validateMedicalInventoryRow(inventory, inventoryRowSearchList);
 					inventory.setStatus(status);
 					inventory = medicalInventoryManager.updateMedicalInventory(inventory, true);
 					MessageDialog.info(null, "angal.inventory.validate.success.msg");
@@ -1116,7 +1173,6 @@ public class InventoryEdit extends ModalJFrame {
 											lotButton.setEnabled(false);
 										}
 									}
-
 								}
 							}
 						} else {
@@ -1147,35 +1203,29 @@ public class InventoryEdit extends ModalJFrame {
 		private static final long serialVersionUID = 1L;
 
 		public InventoryRowModel(boolean add) throws OHServiceException {
+			inventoryRowList.clear();
 			inventoryRowList = loadNewInventoryTable(null, inventory, add);
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
 					addMedInRowInInventorySearchList(invRow);
 				}
-			} else {
-				MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 			}
 			if (areAllMedicalsInInventory()) {
-				allRadio.setSelected(true);
 				specificRadio.setSelected(false);
 				codeTextField.setEnabled(false);
 			} else {
 				specificRadio.setSelected(true);
 				codeTextField.setEnabled(true);
-				allRadio.setSelected(false);
 			}
 		}
 
 		public InventoryRowModel() throws OHServiceException {
+			inventoryRowList.clear();
 			if (!inventoryRowSearchList.isEmpty()) {
 				inventoryRowSearchList.clear();
 			}
 			if (inventory != null) {
 				inventoryRowList = medicalInventoryRowManager.getMedicalInventoryRowByInventoryId(inventory.getId());
-			} else {
-				if (allRadio.isSelected()) {
-					inventoryRowList = loadNewInventoryTable(null, inventory, false);
-				}
 			}
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
@@ -1186,13 +1236,66 @@ public class InventoryEdit extends ModalJFrame {
 				}
 			}
 			if (areAllMedicalsInInventory()) {
-				allRadio.setSelected(true);
 				specificRadio.setSelected(false);
 				codeTextField.setEnabled(false);
 			} else {
 				specificRadio.setSelected(true);
 				codeTextField.setEnabled(true);
-				allRadio.setSelected(false);
+			}
+		}
+		
+		public InventoryRowModel(MedicalType medType) throws OHServiceException {
+			inventoryRowList.clear();
+			inventoryRowList = loadNewInventoryTable(medType);
+			if (!inventoryRowList.isEmpty()) {
+				for (MedicalInventoryRow invRow : inventoryRowList) {
+					addMedInRowInInventorySearchList(invRow);
+				}
+			}
+			if (areAllMedicalsInInventory()) {
+				specificRadio.setSelected(false);
+				codeTextField.setEnabled(false);
+			} else {
+				specificRadio.setSelected(true);
+				codeTextField.setEnabled(true);
+			}
+		}
+
+		public InventoryRowModel(boolean withZeroQty, MedicalType medType) throws OHServiceException {
+			inventoryRowList.clear();
+			inventoryRowList = loadNewInventoryTable(withZeroQty, medType);
+			if (!inventoryRowList.isEmpty()) {
+				for (MedicalInventoryRow invRow : inventoryRowList) {
+					addMedInRowInInventorySearchList(invRow);
+				}
+			} else {
+				MessageDialog.info(null, "angal.invetory.notdataforthatfilter.msg");
+			}
+			if (areAllMedicalsInInventory()) {
+				specificRadio.setSelected(false);
+				codeTextField.setEnabled(false);
+			} else {
+				specificRadio.setSelected(true);
+				codeTextField.setEnabled(true);
+			}
+		}
+		
+		public InventoryRowModel(MedicalType medType, boolean withMovement) throws OHServiceException {
+			inventoryRowList.clear();
+			inventoryRowList = loadNewInventoryTable(medType, withMovement);
+			if (!inventoryRowList.isEmpty()) {
+				for (MedicalInventoryRow invRow : inventoryRowList) {
+					addMedInRowInInventorySearchList(invRow);
+				}
+			} else {
+				MessageDialog.info(null, "angal.invetory.notdataforthatfilter.msg");
+			}
+			if (areAllMedicalsInInventory()) {
+				specificRadio.setSelected(false);
+				codeTextField.setEnabled(false);
+			} else {
+				specificRadio.setSelected(true);
+				codeTextField.setEnabled(true);
 			}
 		}
 
@@ -1503,68 +1606,10 @@ public class InventoryEdit extends ModalJFrame {
 				if (specificRadio.isSelected()) {
 					codeTextField.setEnabled(true);
 					codeTextField.setText("");
-					allRadio.setSelected(false);
 				}
 			});
 		}
 		return specificRadio;
-	}
-
-	private JRadioButton getAllRadio() {
-		if (allRadio == null) {
-			allRadio = new JRadioButton(MessageBundle.getMessage("angal.inventory.allproduct.txt"));
-			allRadio.addActionListener(actionEvent -> {
-				try {
-					if (!areAllMedicalsInInventory()) {
-						codeTextField.setEnabled(false);
-						codeTextField.setText("");
-						if (inventoryRowSearchList.size() > 0) {
-							int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
-							if (info == JOptionPane.YES_OPTION) {
-								try {
-									allRadio.setSelected(true);
-									jTableInventoryRow.setModel(new InventoryRowModel(true));
-								} catch (OHServiceException e) {
-									OHServiceExceptionUtil.showMessages(e);
-								}
-							} else {
-								allRadio.setSelected(false);
-								specificRadio.setSelected(true);
-							}
-
-						} else {
-							if (mode.equals("update")) {
-								try {
-									allRadio.setSelected(true);
-									jTableInventoryRow.setModel(new InventoryRowModel(true));
-
-								} catch (OHServiceException e) {
-									OHServiceExceptionUtil.showMessages(e);
-								}
-							} else {
-								try {
-									jTableInventoryRow.setModel(new InventoryRowModel());
-								} catch (OHServiceException e) {
-									OHServiceExceptionUtil.showMessages(e);
-								}
-							}
-						}
-						if (inventory != null && !inventory.getStatus().equals(InventoryStatus.draft.toString())) {
-							inventory.setStatus(InventoryStatus.draft.toString());
-						}	
-						fireInventoryUpdated();
-						code = null;
-						adjustWidth();
-						MessageDialog.info(null, "angal.invetory.allmedicaladdedsuccessfully.msg");
-					} else {
-						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
-					}
-				} catch (OHServiceException e) {
-					OHServiceExceptionUtil.showMessages(e);
-				}
-			});
-		}
-		return allRadio;
 	}
 
 	private JLabel getDateInventoryLabel() {
@@ -1625,6 +1670,10 @@ public class InventoryEdit extends ModalJFrame {
 		}
 		return inventoryRowsList;
 	}
+	
+	private List<MedicalInventoryRow> loadNewInventoryTable(MedicalType medicalType) throws OHServiceException {
+		return getMedicalInventoryRowsByMedicalType(medicalType);
+	}
 
 	private List<MedicalInventoryRow> getMedicalInventoryRows(String code) throws OHServiceException {
 		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<>();
@@ -1668,6 +1717,76 @@ public class InventoryEdit extends ModalJFrame {
 		}
 		return inventoryRowsList;
 	}
+	
+	private List<MedicalInventoryRow> getMedicalInventoryRowsByMedicalType(MedicalType medType) throws OHServiceException {
+		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<>();
+		String medTypeDescription = medType.getDescription();
+		List<Medical> medicalList =  medicalBrowsingManager.getMedicals(medTypeDescription, false);
+		List<Lot> lots = null;
+		MedicalInventoryRow inventoryRowTemp = null;
+		ListIterator<Medical> medicalListIterator = medicalList.listIterator();
+		while (medicalListIterator.hasNext()) {
+			Medical med = medicalListIterator.next();
+			lots = movStockInsertingManager.getLotByMedical(med, false);
+			double actualQty = med.getInqty() - med.getOutqty();
+			if (lots.size() == 0) {
+				inventoryRowTemp = new MedicalInventoryRow(0, actualQty, actualQty, null, med, null);
+				if (!existInInventorySearchList(inventoryRowTemp)) {
+					inventoryRowsList.add(inventoryRowTemp);
+				}
+			} else {
+				ListIterator<Lot> lotListIterator = lots.listIterator();
+				while (lotListIterator.hasNext()) {
+					Lot lot = lotListIterator.next();
+					inventoryRowTemp = new MedicalInventoryRow(0, lot.getMainStoreQuantity(), lot.getMainStoreQuantity(), null, med, lot);
+					if (!existInInventorySearchList(inventoryRowTemp)) {
+						inventoryRowsList.add(inventoryRowTemp);
+					}
+				}
+			}
+		}
+		return inventoryRowsList;
+	}
+	
+	private List<MedicalInventoryRow> getMedicalInventoryRowsWithMovement() throws OHServiceException {
+		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<>();
+		List<Medical> medicalListWithMovement = new ArrayList<>();
+		List<Lot> lots = null;
+		MedicalInventoryRow inventoryRowTemp = null;
+		List<Medical> medicalList = medicalBrowsingManager.getMedicals();
+		ListIterator<Medical> medicalListIterator = medicalList.listIterator();
+		while (medicalListIterator.hasNext()) {
+			Medical med = medicalListIterator.next();
+			Integer medicalCodde = med.getCode();
+			List<Movement> movements = movBrowserManager.getMovements(medicalCodde, null, null, null, null, null, null, null, null, null);
+			if (movements.size() > 0) {
+				medicalListWithMovement.add(med);
+			}
+		}
+		medicalListIterator = medicalListWithMovement.listIterator();
+		while (medicalListIterator.hasNext()) {
+			Medical med = medicalListIterator.next();
+			lots = movStockInsertingManager.getLotByMedical(med, false);
+			double actualQty = med.getInqty() - med.getOutqty();
+			if (lots.size() == 0) {
+				inventoryRowTemp = new MedicalInventoryRow(0, actualQty, actualQty, null, med, null);
+				if (!existInInventorySearchList(inventoryRowTemp)) {
+					inventoryRowsList.add(inventoryRowTemp);
+				}
+			} else {
+				ListIterator<Lot> lotListIterator = lots.listIterator();
+				while (lotListIterator.hasNext()) {
+					Lot lot = lotListIterator.next();
+					inventoryRowTemp = new MedicalInventoryRow(0, lot.getMainStoreQuantity(), lot.getMainStoreQuantity(), null, med, lot);
+					if (!existInInventorySearchList(inventoryRowTemp)) {
+						inventoryRowsList.add(inventoryRowTemp);
+					}
+				}
+			}
+		}
+		return inventoryRowsList;
+	}
+	
 	private void addInventoryRow(String code) throws OHServiceException {
 		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<MedicalInventoryRow>();
 		List<Medical> medicalList = new ArrayList<Medical>();
@@ -1819,6 +1938,13 @@ public class InventoryEdit extends ModalJFrame {
 			supplierLabel = new JLabel(MessageBundle.getMessage("angal.inventory.supplier.label"));
 		}
 		return supplierLabel;
+	}
+	
+	private JLabel getAddProductLabel() {
+		if (addProductLabel == null) {
+			addProductLabel = new JLabel(MessageBundle.getMessage("angal.inventory.addproduct.label"));
+		}
+		return addProductLabel;
 	}
 
 	private JLabel getDischargeLabel() {
@@ -2025,6 +2151,306 @@ public class InventoryEdit extends ModalJFrame {
 		return false;
 	}
 	
+	private JComboBox<MedicalType> getJComboMedicalType() {
+		if (medicalTypeComboBox == null) {
+			medicalTypeComboBox = new JComboBox<MedicalType>();
+			try {
+				List<MedicalType> medicalTypes = medicalTypeManager.getMedicalType();	
+				MedicalType medicalType = new MedicalType(MessageBundle.getMessage("angal.common.all.txt"), MessageBundle.getMessage("angal.common.all.txt"));
+				medicalTypeComboBox.addItem(medicalType);
+				for (MedicalType medType: medicalTypes) {
+					medicalTypeComboBox.addItem(medType);
+				}
+			} catch (OHServiceException e) {
+				OHServiceExceptionUtil.showMessages(e);
+			}
+			
+			medicalTypeComboBox.addActionListener(actionEvent -> {
+				medicalTypeSelected = (MedicalType) medicalTypeComboBox.getSelectedItem();
+			});
+		}
+		return medicalTypeComboBox;
+	}
+	
+    private JRadioButton getAllRadioButton() {
+    	if (radioButtonAll == null) {
+    		radioButtonAll = new JRadioButton(MessageBundle.getMessage("angal.common.all.btn"));
+    		radioButtonAll.setMnemonic(MessageBundle.getMnemonic("angal.common.all.btn.key"));
+    		radioButtonAll.setSelected(true);
+    	}
+    	radioButtonAll.addActionListener(actionEvent -> {
+    		if (radioButtonAll.isSelected()) {
+    			radioOnlyNonZero.setSelected(false);
+				radioWithMovement.setSelected(false);
+			}
+		});
+		return radioButtonAll;
+	}
+    
+    private JRadioButton getMedicalWithNonZeroQuatityRadioButton() {
+    	if (radioOnlyNonZero == null) {
+    		radioOnlyNonZero = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithonlynonzeroqty.btn"));
+    		radioOnlyNonZero.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithonlynonzeroqty.btn.key"));
+    	}
+    	radioOnlyNonZero.addActionListener(actionEvent -> {
+			if (radioOnlyNonZero.isSelected()) {
+				radioButtonAll.setSelected(false);
+				radioWithMovement.setSelected(false);
+			}
+		});
+		return radioOnlyNonZero;
+	}
+    
+    private JRadioButton getMedicalWithMovementRadioButton() {
+    	if (radioWithMovement == null) {
+    		radioWithMovement = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithmovementonly.btn"));
+    		radioWithMovement.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithmovementonly.btn.key"));
+    	}
+    	radioWithMovement.addActionListener(actionEvent -> {
+    		if (radioWithMovement.isSelected()) {
+    			radioButtonAll.setSelected(false);
+    			radioOnlyNonZero.setSelected(false);
+			}
+		});
+		return radioWithMovement;
+	}
+    
+    private JButton getCancelButton() {
+    	if (jButtonCancel == null) {
+    		jButtonCancel = new JButton(MessageBundle.getMessage("angal.common.cancel.btn"));
+    		jButtonCancel.setMnemonic(MessageBundle.getMnemonic("angal.common.cancel.btn.key"));
+    	}
+		jButtonCancel.addActionListener(actionEvent -> {
+			frame.dispose();
+		});
+		return jButtonCancel;
+	}
+	private List<MedicalInventoryRow> loadNewInventoryTable(boolean withNonZeroQty, MedicalType medicalTypeSelected) throws OHServiceException {	
+		List<MedicalInventoryRow> inventoryRowsList = getMedicalInventoryRows(null);
+		if (withNonZeroQty) {
+			inventoryRowsList = inventoryRowsList.stream().filter(inv -> inv.getTheoreticQty() > 0).collect(Collectors.toList());
+		}
+		if (medicalTypeSelected != null) {
+			inventoryRowsList = inventoryRowsList.stream().filter(inv -> inv.getMedical().getType().getDescription().equals(medicalTypeSelected.getDescription())).collect(Collectors.toList());
+		}
+		return inventoryRowsList;
+	}
+    
+	private List<MedicalInventoryRow> loadNewInventoryTable(MedicalType medicalTypeSelected, boolean withMovement) throws OHServiceException {	
+		List<MedicalInventoryRow> inventoryRowsList = getMedicalInventoryRowsWithMovement();
+		if (medicalTypeSelected != null) {
+			inventoryRowsList = inventoryRowsList.stream().filter(inv -> inv.getMedical().getType().getDescription().equals(medicalTypeSelected.getDescription())).collect(Collectors.toList());
+		}
+		return inventoryRowsList;
+	}
+    
+    private JButton getOkButton() {
+    	if (jButtonOk == null) {
+    		jButtonOk = new JButton(MessageBundle.getMessage("angal.common.ok.btn"));
+    		jButtonOk.setMnemonic(MessageBundle.getMnemonic("angal.common.ok.btn.key"));
+    		jButtonOk.addActionListener(actionEvent -> {
+        		try {
+        			medicalTypeSelected = (MedicalType) medicalTypeComboBox.getSelectedItem();
+            		if (radioButtonAll.isSelected()) {
+            			if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
+            				if (!areAllMedicalsInInventory()) {
+            					codeTextField.setEnabled(false);
+            					codeTextField.setText("");
+            					if (inventoryRowSearchList.size() > 0) {
+            						int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
+            						if (info == JOptionPane.YES_OPTION) {
+            							try {
+            								jTableInventoryRow.setModel(new InventoryRowModel(true));
+            							} catch (OHServiceException e) {
+            								OHServiceExceptionUtil.showMessages(e);
+            							}
+            						} else {
+            							specificRadio.setSelected(true);
+            						}
+
+            					} else {
+            						try {
+        								jTableInventoryRow.setModel(new InventoryRowModel(true));
+        							} catch (OHServiceException e) {
+        								OHServiceExceptionUtil.showMessages(e);
+        							}
+            					}	
+            					fireInventoryUpdated();
+            					code = null;
+            					adjustWidth();
+            					jButtonCancel.doClick();
+            					MessageDialog.info(null, "angal.invetory.allmedicaladdedsuccessfully.msg");
+            				} else {
+            					jButtonCancel.doClick();
+        						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
+        					}
+            			} else {
+            				if (!areAllMedicalsInInventory()) {
+            					codeTextField.setEnabled(false);
+            					codeTextField.setText("");
+            					if (inventoryRowSearchList.size() > 0) {
+            						int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
+            						if (info == JOptionPane.YES_OPTION) {
+            							try {
+            								jTableInventoryRow.setModel(new InventoryRowModel(medicalTypeSelected));
+            							} catch (OHServiceException e) {
+            								OHServiceExceptionUtil.showMessages(e);
+            							}
+            						} else {
+            							specificRadio.setSelected(true);
+            						}
+
+            					} else {
+            						try {
+        								jTableInventoryRow.setModel(new InventoryRowModel(medicalTypeSelected));
+        							} catch (OHServiceException e) {
+        								OHServiceExceptionUtil.showMessages(e);
+        							}
+            					}	
+            					fireInventoryUpdated();
+            					code = null;
+            					adjustWidth();
+            					jButtonCancel.doClick();
+            					MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
+            				} else {
+            					jButtonCancel.doClick();
+        						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
+        					}
+            			}
+            		}
+            		if (radioOnlyNonZero.isSelected()) {
+            			if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
+            				if (!areAllMedicalsInInventory()) {
+            					codeTextField.setEnabled(false);
+            					codeTextField.setText("");
+            					if (inventoryRowSearchList.size() > 0) {
+            						int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
+            						if (info == JOptionPane.YES_OPTION) {
+            							jTableInventoryRow.setModel(new InventoryRowModel(true, null));
+            						} else {
+            							specificRadio.setSelected(true);
+            						}
+
+            					} else {
+            						try {
+        								jTableInventoryRow.setModel(new InventoryRowModel(true, null));
+        							} catch (OHServiceException e) {
+        								OHServiceExceptionUtil.showMessages(e);
+        							}
+            					}	
+            					fireInventoryUpdated();
+            					code = null;
+            					adjustWidth();
+            					jButtonCancel.doClick();
+            					if (inventoryRowList.size() > 0) {
+            						MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");	
+            					}
+            				} else {
+            					jButtonCancel.doClick();
+        						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
+        					}
+            			} else {
+            				if (!areAllMedicalsInInventory()) {
+            					codeTextField.setEnabled(false);
+            					codeTextField.setText("");
+            					if (inventoryRowSearchList.size() > 0) {
+            						int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
+            						if (info == JOptionPane.YES_OPTION) {
+            							jTableInventoryRow.setModel(new InventoryRowModel(true, medicalTypeSelected));
+            						} else {
+            							specificRadio.setSelected(true);
+            						}
+
+            					} else {
+            						try {
+        								jTableInventoryRow.setModel(new InventoryRowModel(true, medicalTypeSelected));
+        							} catch (OHServiceException e) {
+        								OHServiceExceptionUtil.showMessages(e);
+        							}
+            					}	
+            					fireInventoryUpdated();
+            					code = null;
+            					adjustWidth();
+            					jButtonCancel.doClick();
+            					if (inventoryRowList.size() > 0) {
+            						MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");	
+            					}
+            				} else {
+            					jButtonCancel.doClick();
+        						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
+        					}
+            			}
+            		}
+            		if (radioWithMovement.isSelected()) {
+            			if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
+            				if (!areAllMedicalsInInventory()) {
+            					codeTextField.setEnabled(false);
+            					codeTextField.setText("");
+            					if (inventoryRowSearchList.size() > 0) {
+            						int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
+            						if (info == JOptionPane.YES_OPTION) {
+            							jTableInventoryRow.setModel(new InventoryRowModel(null, true));
+            						} else {
+            							specificRadio.setSelected(true);
+            						}
+
+            					} else {
+            						try {
+        								jTableInventoryRow.setModel(new InventoryRowModel(null, true));
+        							} catch (OHServiceException e) {
+        								OHServiceExceptionUtil.showMessages(e);
+        							}
+            					}	
+            					fireInventoryUpdated();
+            					code = null;
+            					adjustWidth();
+            					jButtonCancel.doClick();
+            					if (inventoryRowList.size() > 0) {
+            						MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");	
+            					}
+            				} else {
+            					jButtonCancel.doClick();
+        						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
+        					}
+            			} else {
+            				if (!areAllMedicalsInInventory()) {
+            					codeTextField.setEnabled(false);
+            					codeTextField.setText("");
+            					if (inventoryRowSearchList.size() > 0) {
+            						int info = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg");
+            						if (info == JOptionPane.YES_OPTION) {
+            							jTableInventoryRow.setModel(new InventoryRowModel(medicalTypeSelected, true));
+            						} else {
+            							specificRadio.setSelected(true);
+            						}
+
+            					} else {
+            						try {
+        								jTableInventoryRow.setModel(new InventoryRowModel(medicalTypeSelected, true));
+        							} catch (OHServiceException e) {
+        								OHServiceExceptionUtil.showMessages(e);
+        							}
+            					}	
+            					fireInventoryUpdated();
+            					code = null;
+            					adjustWidth();
+            					jButtonCancel.doClick();
+            					if (inventoryRowList.size() > 0) {
+            						MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");	
+            					}
+            				} else {
+            					jButtonCancel.doClick();
+        						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
+        					}
+            			}
+            		}
+        		} catch (OHServiceException e) {
+    				OHServiceExceptionUtil.showMessages(e);
+    			}
+    		});
+    	}
+		return jButtonOk;
+    }
 	private  boolean areAllMedicalsInInventory() throws OHServiceException {
 		List<Medical> medicals = medicalBrowsingManager.getMedicals();
 		Set<Medical> inventorySet = new HashSet<>();
