@@ -1180,22 +1180,8 @@ public class InventoryEdit extends ModalJFrame {
 			});
 			DefaultCellEditor cellEditor = new DefaultCellEditor(jTextFieldEditor);
 			jTableInventoryRow.setDefaultEditor(Integer.class, cellEditor);
-			model.addTableModelListener(new TableModelListener() {
-				@Override
-				public void tableChanged(TableModelEvent e) {
-	                updateListFromModel();
-				}
-	        });
 		}
 		return jTableInventoryRow;
-	}
-	private void updateListFromModel() {
-	    for (int i = 0; i < model.getRowCount(); i++) {
-	    	jTableInventoryRow.convertRowIndexToView(i);
-	    }
-	    for (int i = 0; i < model.getColumnCount(); i++) {
-	    	jTableInventoryRow.convertColumnIndexToView(i);
-	    }
 	}
 
 	class EnabledTableCellRenderer extends DefaultTableCellRenderer {
