@@ -73,6 +73,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -1183,8 +1185,22 @@ public class InventoryEdit extends ModalJFrame {
 			});
 			DefaultCellEditor cellEditor = new DefaultCellEditor(jTextFieldEditor);
 			jTableInventoryRow.setDefaultEditor(Integer.class, cellEditor);
+			model.addTableModelListener(new TableModelListener() {
+				@Override
+				public void tableChanged(TableModelEvent e) {
+	                updateListFromModel();
+				}
+	        });
 		}
 		return jTableInventoryRow;
+	}
+	private void updateListFromModel() {
+	    for (int i = 0; i < model.getRowCount(); i++) {
+	    	jTableInventoryRow.convertRowIndexToView(i);
+	    }
+	    for (int i = 0; i < model.getColumnCount(); i++) {
+	    	jTableInventoryRow.convertColumnIndexToView(i);
+	    }
 	}
 
 	class EnabledTableCellRenderer extends DefaultTableCellRenderer {
