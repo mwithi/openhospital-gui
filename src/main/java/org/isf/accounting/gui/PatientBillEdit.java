@@ -845,11 +845,13 @@ public class PatientBillEdit extends JDialog implements SelectionListener {
 			jButtonTrashPatient.setPreferredSize(new Dimension(25, 25));
 			jButtonTrashPatient.setIcon(new ImageIcon("rsc/icons/remove_patient_button.png"));
 			jButtonTrashPatient.setToolTipText(MessageBundle.getMessage("angal.newbill.removethepatientassociatedwiththisbill.tooltip"));
+			if (thisBill.getBillPatient() == null) {
+				jButtonTrashPatient.setEnabled(false);
+			}
 			jButtonTrashPatient.addActionListener(actionEvent -> {
 				// BILL
 				thisBill.setBillPatient(null);
 				thisBill.setIsPatient(false);
-				thisBill.getBillPatient().setCode(0);
 				thisBill.setPatName(""); //$NON-NLS-1$
 				thisBill.setAdmission(null);
 				// INTERFACE
@@ -895,6 +897,9 @@ public class PatientBillEdit extends JDialog implements SelectionListener {
 			jButtonPickPatient.setText(MessageBundle.getMessage("angal.newbill.changepatient.btn"));
 			jButtonPickPatient.setMnemonic(MessageBundle.getMnemonic("angal.newbill.changepatient.btn.key"));
 			jButtonPickPatient.setToolTipText(MessageBundle.getMessage("angal.newbill.changethepatientassociatedwiththisbill.tooltip"));
+			if (jButtonTrashPatient != null) {
+				jButtonTrashPatient.setEnabled(true);	
+			}
 		}
 	}
 
