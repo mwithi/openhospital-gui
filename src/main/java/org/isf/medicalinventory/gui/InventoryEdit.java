@@ -282,17 +282,12 @@ public class InventoryEdit extends ModalJFrame {
 			setTitle(MessageBundle.getMessage("angal.inventory.editinventory.title"));
 		}
 		getContentPane().setLayout(new BorderLayout());
-
 		panelHeader = getPanelHeader();
-
 		getContentPane().add(panelHeader, BorderLayout.NORTH);
-
 		panelContent = getPanelContent();
 		getContentPane().add(panelContent, BorderLayout.CENTER);
-
 		panelFooter = getPanelFooter();
 		getContentPane().add(panelFooter, BorderLayout.SOUTH);
-
 		addWindowListener(new WindowAdapter() {
 
 			public void windowClosing(WindowEvent e) {
