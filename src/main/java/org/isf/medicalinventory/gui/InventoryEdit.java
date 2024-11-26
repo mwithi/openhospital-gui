@@ -540,7 +540,7 @@ public class InventoryEdit extends ModalJFrame {
 		        frame.setSize(450, 200);
 		        frame.setTitle(MessageBundle.getMessage("angal.inventoryrow.lotinformation.title"));
 		        frame.setLocationRelativeTo(null);
-		        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		        frame.setVisible(true);
 			});
 		}
