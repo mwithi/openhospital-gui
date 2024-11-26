@@ -1694,7 +1694,7 @@ public class InventoryEdit extends ModalJFrame {
 				}
 			}
 		} else {
-			medicalList = medicalBrowsingManager.getMedicals();
+			medicalList = medicals;
 		}
 		ListIterator<Medical> medicalListIterator = medicalList.listIterator();
 		while (medicalListIterator.hasNext()) {
@@ -1755,7 +1755,7 @@ public class InventoryEdit extends ModalJFrame {
 		List<Medical> medicalListWithMovement = new ArrayList<>();
 		List<Lot> lots = null;
 		MedicalInventoryRow inventoryRowTemp = null;
-		List<Medical> medicalList = medicalBrowsingManager.getMedicals();
+		List<Medical> medicalList = medicals;
 		ListIterator<Medical> medicalListIterator = medicalList.listIterator();
 		while (medicalListIterator.hasNext()) {
 			Medical med = medicalListIterator.next();
