@@ -544,7 +544,7 @@ public class InventoryEdit extends ModalJFrame {
 		        frame.setSize(450, 200);
 		        frame.setTitle(MessageBundle.getMessage("angal.inventoryrow.lotinformation.title"));
 		        frame.setLocationRelativeTo(null);
-		        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		        frame.setVisible(true);
 			});
 		}
@@ -1789,8 +1789,8 @@ public class InventoryEdit extends ModalJFrame {
 	}
 	
 	private void addInventoryRow(String code) throws OHServiceException {
-		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<MedicalInventoryRow>();
-		List<Medical> medicalList = new ArrayList<Medical>();
+		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<>();
+		List<Medical> medicalList = new ArrayList<>();
 		List<Lot> lots = null;
 		Medical medical = null;
 		MedicalInventoryRow inventoryRowTemp = null;
@@ -2153,7 +2153,7 @@ public class InventoryEdit extends ModalJFrame {
 	
 	private JComboBox<MedicalType> getJComboMedicalType() {
 		if (medicalTypeComboBox == null) {
-			medicalTypeComboBox = new JComboBox<MedicalType>();
+			medicalTypeComboBox = new JComboBox<>();
 			try {
 				List<MedicalType> medicalTypes = medicalTypeManager.getMedicalType();	
 				MedicalType medicalType = new MedicalType(MessageBundle.getMessage("angal.common.all.txt"), MessageBundle.getMessage("angal.common.all.txt"));
