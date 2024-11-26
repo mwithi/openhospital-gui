@@ -2150,7 +2150,7 @@ public class InventoryEdit extends ModalJFrame {
 	
 	private JComboBox<MedicalType> getJComboMedicalType() {
 		if (medicalTypeComboBox == null) {
-			medicalTypeComboBox = new JComboBox<MedicalType>();
+			medicalTypeComboBox = new JComboBox<>();
 			try {
 				List<MedicalType> medicalTypes = medicalTypeManager.getMedicalType();	
 				MedicalType medicalType = new MedicalType(MessageBundle.getMessage("angal.common.all.txt"), MessageBundle.getMessage("angal.common.all.txt"));
