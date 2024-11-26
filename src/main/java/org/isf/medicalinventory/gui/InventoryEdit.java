@@ -1785,7 +1785,7 @@ public class InventoryEdit extends ModalJFrame {
 	}
 	
 	private void addInventoryRow(String code) throws OHServiceException {
-		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<MedicalInventoryRow>();
+		List<MedicalInventoryRow> inventoryRowsList = new ArrayList<>();
 		List<Medical> medicalList = new ArrayList<>();
 		List<Lot> lots = null;
 		Medical medical = null;
