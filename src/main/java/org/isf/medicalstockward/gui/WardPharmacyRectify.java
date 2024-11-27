@@ -162,7 +162,7 @@ public class WardPharmacyRectify extends JDialog {
 		super(owner, true);
 		selectedWard = ward;
 		try {
-			wardDrugs = movWardBrowserManager.getMedicalsWard(selectedWard.getCode().charAt(0), false);
+			wardDrugs = movWardBrowserManager.getMedicalsWard(selectedWard.getCode(), false);
 		} catch (OHServiceException e) {
 			OHServiceExceptionUtil.showMessages(e);
 		}
@@ -184,7 +184,7 @@ public class WardPharmacyRectify extends JDialog {
 		super(owner, true);
 		selectedWard = ward;
 		try {
-			wardDrugs = movWardBrowserManager.getMedicalsWard(selectedWard.getCode().charAt(0), false);
+			wardDrugs = movWardBrowserManager.getMedicalsWard(selectedWard.getCode(), false);
 		} catch (OHServiceException e) {
 			OHServiceExceptionUtil.showMessages(e);
 		}
