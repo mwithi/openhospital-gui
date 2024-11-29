@@ -2182,7 +2182,7 @@ public class InventoryEdit extends ModalJFrame {
 		return radioButtonAll;
 	}
 
-	private JRadioButton getMedicalWithNonZeroQuatityRadioButton() {
+	private JRadioButton getMedicalWithNonZeroQuantityRadioButton() {
 		if (radioOnlyNonZero == null) {
 			radioOnlyNonZero = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithonlynonzeroqty.btn"));
 			radioOnlyNonZero.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithonlynonzeroqty.btn.key"));
