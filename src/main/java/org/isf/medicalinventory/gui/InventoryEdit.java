@@ -520,16 +520,16 @@ public class InventoryEdit extends ModalJFrame {
 				leftPanel.add(new JLabel(MessageBundle.getMessage("angal.inventoryrow.medicaltype.txt")));
 				leftPanel.add(getJComboMedicalType());
 
-				ButtonGroup radioGroup = new ButtonGroup();
-				radioGroup.add(radioButtonAll);
-				radioGroup.add(radioOnlyNonZero);
-				radioGroup.add(radioWithMovement);
-
 				JPanel rightPanel = new JPanel();
 				rightPanel.setLayout(new GridLayout(3, 1, 5, 5));
 				rightPanel.add(getAllRadioButton());
 				rightPanel.add(getMedicalWithNonZeroQuatityRadioButton());
 				rightPanel.add(getMedicalWithMovementRadioButton());
+				
+				ButtonGroup radioGroup = new ButtonGroup();
+				radioGroup.add(radioButtonAll);
+				radioGroup.add(radioOnlyNonZero);
+				radioGroup.add(radioWithMovement);
 
 				JPanel bottomPanel = new JPanel();
 				bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -1263,9 +1263,9 @@ public class InventoryEdit extends ModalJFrame {
 			}
 		}
 
-		public InventoryRowModel(boolean withZeroQty, MedicalType medType) throws OHServiceException {
+		public InventoryRowModel(boolean withNoZeroQty, MedicalType medType) throws OHServiceException {
 			inventoryRowList.clear();
-			inventoryRowList = loadNewInventoryTable(withZeroQty, medType);
+			inventoryRowList = loadNewInventoryTable(withNoZeroQty, medType);
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
 					addMedInRowInInventorySearchList(invRow);
@@ -2179,12 +2179,6 @@ public class InventoryEdit extends ModalJFrame {
 			radioButtonAll.setMnemonic(MessageBundle.getMnemonic("angal.common.all.btn.key"));
 			radioButtonAll.setSelected(true);
 		}
-		radioButtonAll.addActionListener(actionEvent -> {
-			if (radioButtonAll.isSelected()) {
-				radioOnlyNonZero.setSelected(false);
-				radioWithMovement.setSelected(false);
-			}
-		});
 		return radioButtonAll;
 	}
 
@@ -2193,12 +2187,6 @@ public class InventoryEdit extends ModalJFrame {
 			radioOnlyNonZero = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithonlynonzeroqty.btn"));
 			radioOnlyNonZero.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithonlynonzeroqty.btn.key"));
 		}
-		radioOnlyNonZero.addActionListener(actionEvent -> {
-			if (radioOnlyNonZero.isSelected()) {
-				radioButtonAll.setSelected(false);
-				radioWithMovement.setSelected(false);
-			}
-		});
 		return radioOnlyNonZero;
 	}
 
@@ -2207,12 +2195,6 @@ public class InventoryEdit extends ModalJFrame {
 			radioWithMovement = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithmovementonly.btn"));
 			radioWithMovement.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithmovementonly.btn.key"));
 		}
-		radioWithMovement.addActionListener(actionEvent -> {
-			if (radioWithMovement.isSelected()) {
-				radioButtonAll.setSelected(false);
-				radioOnlyNonZero.setSelected(false);
-			}
-		});
 		return radioWithMovement;
 	}
 
@@ -2260,8 +2242,6 @@ public class InventoryEdit extends ModalJFrame {
 					if (radioButtonAll.isSelected()) {
 						if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
 							if (!areAllMedicalsInInventory()) {
-								codeTextField.setEnabled(false);
-								codeTextField.setText("");
 								int info = (!inventoryRowSearchList.isEmpty()) ? MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg") : JOptionPane.YES_OPTION;
 								if (info == JOptionPane.YES_OPTION) {
 									try {
@@ -2269,11 +2249,8 @@ public class InventoryEdit extends ModalJFrame {
 									} catch (OHServiceException e) {
 										OHServiceExceptionUtil.showMessages(e);
 									}
-								} else {
-									specificRadio.setSelected(true);
 								}
 								fireInventoryUpdated();
-								code = null;
 								adjustWidth();
 								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.invetory.allmedicaladdedsuccessfully.msg");
@@ -2283,20 +2260,16 @@ public class InventoryEdit extends ModalJFrame {
 							}
 						} else {
 							if (!areAllMedicalsInInventory()) {
-								codeTextField.setEnabled(false);
-								codeTextField.setText("");
 								int info = (!inventoryRowSearchList.isEmpty()) ? MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg") : JOptionPane.YES_OPTION;
 								if (info == JOptionPane.YES_OPTION) {
 									try {
-										jTableInventoryRow.setModel(new InventoryRowModel(true));
+										MedicalType medType = (MedicalType)medicalTypeComboBox.getSelectedItem();
+										jTableInventoryRow.setModel(new InventoryRowModel(medType));
 									} catch (OHServiceException e) {
 										OHServiceExceptionUtil.showMessages(e);
 									}
-								} else {
-									specificRadio.setSelected(true);
 								}
 								fireInventoryUpdated();
-								code = null;
 								adjustWidth();
 								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
@@ -2307,22 +2280,18 @@ public class InventoryEdit extends ModalJFrame {
 						}
 					}
 					if (radioOnlyNonZero.isSelected()) {
+						MedicalType medType = (MedicalType)medicalTypeComboBox.getSelectedItem();
 						if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
 							if (!areAllMedicalsInInventory()) {
-								codeTextField.setEnabled(false);
-								codeTextField.setText("");
 								int info = (!inventoryRowSearchList.isEmpty()) ? MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg") : JOptionPane.YES_OPTION;
 								if (info == JOptionPane.YES_OPTION) {
 									try {
-										jTableInventoryRow.setModel(new InventoryRowModel(true));
+										jTableInventoryRow.setModel(new InventoryRowModel(true, null));
 									} catch (OHServiceException e) {
 										OHServiceExceptionUtil.showMessages(e);
 									}
-								} else {
-									specificRadio.setSelected(true);
 								}
 								fireInventoryUpdated();
-								code = null;
 								adjustWidth();
 								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
@@ -2334,20 +2303,15 @@ public class InventoryEdit extends ModalJFrame {
 							}
 						} else {
 							if (!areAllMedicalsInInventory()) {
-								codeTextField.setEnabled(false);
-								codeTextField.setText("");
 								int info = (!inventoryRowSearchList.isEmpty()) ? MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg") : JOptionPane.YES_OPTION;
 								if (info == JOptionPane.YES_OPTION) {
 									try {
-										jTableInventoryRow.setModel(new InventoryRowModel(true));
+										jTableInventoryRow.setModel(new InventoryRowModel(true, medType));
 									} catch (OHServiceException e) {
 										OHServiceExceptionUtil.showMessages(e);
 									}
-								} else {
-									specificRadio.setSelected(true);
 								}
 								fireInventoryUpdated();
-								code = null;
 								adjustWidth();
 								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
@@ -2360,22 +2324,18 @@ public class InventoryEdit extends ModalJFrame {
 						}
 					}
 					if (radioWithMovement.isSelected()) {
+						MedicalType medType = (MedicalType)medicalTypeComboBox.getSelectedItem();
 						if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
 							if (!areAllMedicalsInInventory()) {
-								codeTextField.setEnabled(false);
-								codeTextField.setText("");
 								int info = (!inventoryRowSearchList.isEmpty()) ? MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg") : JOptionPane.YES_OPTION;
 								if (info == JOptionPane.YES_OPTION) {
 									try {
-										jTableInventoryRow.setModel(new InventoryRowModel(true));
+										jTableInventoryRow.setModel(new InventoryRowModel(null, true));
 									} catch (OHServiceException e) {
 										OHServiceExceptionUtil.showMessages(e);
 									}
-								} else {
-									specificRadio.setSelected(true);
 								}
 								fireInventoryUpdated();
-								code = null;
 								adjustWidth();
 								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
@@ -2387,20 +2347,15 @@ public class InventoryEdit extends ModalJFrame {
 							}
 						} else {
 							if (!areAllMedicalsInInventory()) {
-								codeTextField.setEnabled(false);
-								codeTextField.setText("");
 								int info = (!inventoryRowSearchList.isEmpty()) ? MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttoaddallnotyetlistedproducts.msg") : JOptionPane.YES_OPTION;
 								if (info == JOptionPane.YES_OPTION) {
 									try {
-										jTableInventoryRow.setModel(new InventoryRowModel(true));
+										jTableInventoryRow.setModel(new InventoryRowModel(medType, true));
 									} catch (OHServiceException e) {
 										OHServiceExceptionUtil.showMessages(e);
 									}
-								} else {
-									specificRadio.setSelected(true);
 								}
 								fireInventoryUpdated();
-								code = null;
 								adjustWidth();
 								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
@@ -2429,5 +2384,5 @@ public class InventoryEdit extends ModalJFrame {
 			return true;
 		}
 		return false;
-	}
+	}	
 }
