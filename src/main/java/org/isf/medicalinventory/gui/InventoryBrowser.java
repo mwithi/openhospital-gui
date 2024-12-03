@@ -220,12 +220,12 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			gbc_jCalendarTo.gridx = 3;
 			gbc_jCalendarTo.gridy = 0;
 			panelHeader.add(getJCalendarTo(), gbc_jCalendarTo);
-			GridBagConstraints gbc_stateLabel = new GridBagConstraints();
-			gbc_stateLabel.fill = GridBagConstraints.HORIZONTAL;
-			gbc_stateLabel.insets = new Insets(0, 0, 0, 5);
-			gbc_stateLabel.gridx = 4;
-			gbc_stateLabel.gridy = 0;
-			panelHeader.add(getStateLabel(), gbc_stateLabel);
+			GridBagConstraints gbc_statusLabel = new GridBagConstraints();
+			gbc_statusLabel.fill = GridBagConstraints.HORIZONTAL;
+			gbc_statusLabel.insets = new Insets(0, 0, 0, 5);
+			gbc_statusLabel.gridx = 4;
+			gbc_statusLabel.gridy = 0;
+			panelHeader.add(getStatusLabel(), gbc_statusLabel);
 			GridBagConstraints gbc_comboBox = new GridBagConstraints();
 			gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
 			gbc_comboBox.gridx = 5;
@@ -602,8 +602,9 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		if (statusComboBox == null) {
 			statusComboBox = new JComboBox<String>();
 			statusComboBox.addItem("");
-			for (InventoryStatus currentStatus : InventoryStatus.values()) {
-				statusComboBox.addItem(MessageBundle.getMessage("angal.inventory." + currentStatus));
+			List<String> statusList = medicalInventoryManager.getStatusList();
+			for (String status : statusList) {
+				statusComboBox.addItem(status);
 			}
 			statusComboBox.addActionListener(actionEvent -> {
 				InventoryBrowsingModel inventoryModel = new InventoryBrowsingModel();
@@ -622,7 +623,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		return statusComboBox;
 	}
 
-	private JLabel getStateLabel() {
+	private JLabel getStatusLabel() {
 		if (statusLabel == null) {
 			statusLabel = new JLabel(MessageBundle.getMessage("angal.inventory.status.txt"));
 			statusLabel.setHorizontalAlignment(SwingConstants.RIGHT);

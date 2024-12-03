@@ -91,7 +91,6 @@ import org.isf.medstockmovtype.model.MovementType;
 import org.isf.menu.manager.Context;
 import org.isf.menu.manager.UserBrowsingManager;
 import org.isf.stat.gui.report.GenericReportPharmaceuticalInventory;
-import org.isf.stat.manager.JasperReportsManager;
 import org.isf.supplier.manager.SupplierBrowserManager;
 import org.isf.supplier.model.Supplier;
 import org.isf.utils.db.NormalizeString;
@@ -229,7 +228,6 @@ public class InventoryEdit extends ModalJFrame {
 	private MedicalDsrStockMovementTypeBrowserManager movTypeManager = Context.getApplicationContext().getBean(MedicalDsrStockMovementTypeBrowserManager.class);
 	private SupplierBrowserManager supplierManager = Context.getApplicationContext().getBean(SupplierBrowserManager.class);
 	private WardBrowserManager wardManager = Context.getApplicationContext().getBean(WardBrowserManager.class);
-	private JasperReportsManager jasperReportsManager = Context.getApplicationContext().getBean(JasperReportsManager.class);
 
 	public InventoryEdit() {
 		mode = "new";
@@ -989,7 +987,7 @@ public class InventoryEdit extends ModalJFrame {
 							fireInventoryUpdated();
 							adjustWidth();
 						} catch (OHServiceException e1) {
-							OHServiceExceptionUtil.showMessages(e);
+							OHServiceExceptionUtil.showMessages(e1);
 						}
 					}
 				}
@@ -1783,12 +1781,14 @@ public class InventoryEdit extends ModalJFrame {
 	private JLabel getStatusLabel() {
 		if (statusLabel == null) {
 			if (inventory == null) {
-				String currentStatus = InventoryStatus.draft.toString().toUpperCase();
-				statusLabel = new JLabel(currentStatus);
+				String currentStatus = InventoryStatus.draft.toString();
+				String status = medicalInventoryManager.getStatusByKey(currentStatus);
+				statusLabel = new JLabel(status.toUpperCase());
 				statusLabel.setForeground(Color.GRAY);
 			} else {
-				String currentStatus = inventory.getStatus().toUpperCase();
-				statusLabel = new JLabel(currentStatus);
+				String currentStatus = inventory.getStatus();
+				String status = medicalInventoryManager.getStatusByKey(currentStatus);
+				statusLabel = new JLabel(status.toUpperCase());
 				if (currentStatus.equalsIgnoreCase(InventoryStatus.draft.toString())) {
 					statusLabel.setForeground(Color.GRAY);
 				}
