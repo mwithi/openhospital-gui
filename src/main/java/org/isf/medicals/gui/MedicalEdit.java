@@ -432,7 +432,7 @@ public class MedicalEdit extends JDialog {
 		if (typeComboBox == null) {
 			typeComboBox = new JComboBox<>();
 			try {
-				List<MedicalType> types = medicalTypeManager.getMedicalType();
+				List<MedicalType> types = medicalTypeManager.getAllActiveMedicalType();
 				for (MedicalType elem : types) {
 					typeComboBox.addItem(elem);
 				}

@@ -340,20 +340,24 @@ public class UserEdit extends JDialog {
 		if (userGroupComboBox == null) {
 			userGroupComboBox = new JComboBox<>();
 			try {
-				List<UserGroup> group = userBrowsingManager.getUserGroup();
+				List<UserGroup> groups = userBrowsingManager.getUserGroup();
 				if (insert) {
-					if (group != null) {
-						for (UserGroup elem : group) {
-							userGroupComboBox.addItem(elem);
+					if (groups != null) {
+						for (UserGroup group : groups) {
+							if (!group.isDeleted()) {
+								userGroupComboBox.addItem(group);
+							}
 						}
 					}
 				} else {
 					UserGroup selectedUserGroup = null;
-					if (group != null) {
-						for (UserGroup elem : group) {
-							userGroupComboBox.addItem(elem);
-							if (user.getUserGroupName().equals(elem)) {
-								selectedUserGroup = elem;
+					if (groups != null) {
+						for (UserGroup group : groups) {
+							if (!group.isDeleted()) {
+								userGroupComboBox.addItem(group);
+								if (user.getUserGroupName().equals(group)) {
+									selectedUserGroup = group;
+								}
 							}
 						}
 					}
