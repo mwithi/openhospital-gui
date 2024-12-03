@@ -276,7 +276,7 @@ public class InventoryEdit extends ModalJFrame {
 		} catch (OHServiceException e) {
 			OHServiceExceptionUtil.showMessages(e);
 		}
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setMinimumSize(new Dimension(1000, 600));
 		setLocationRelativeTo(null);
 		if (mode.equals("new")) {
