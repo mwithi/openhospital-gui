@@ -1858,7 +1858,7 @@ public class InventoryEdit extends ModalJFrame {
 			key = med.getCode().toString().toLowerCase();
 			medicalMap.put(key, med);
 		}
-		ArrayList<Medical> medList = new ArrayList<Medical>();
+		ArrayList<Medical> medList = new ArrayList<>();
 		for (Medical aMed : medicalMap.values()) {
 			if (NormalizeString.normalizeContains(aMed.getDescription().toLowerCase(), text)) {
 				medList.add(aMed);
