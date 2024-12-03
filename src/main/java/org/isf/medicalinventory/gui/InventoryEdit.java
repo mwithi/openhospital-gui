@@ -2204,9 +2204,7 @@ public class InventoryEdit extends ModalJFrame {
 			jButtonCancel = new JButton(MessageBundle.getMessage("angal.common.cancel.btn"));
 			jButtonCancel.setMnemonic(MessageBundle.getMnemonic("angal.common.cancel.btn.key"));
 		}
-		jButtonCancel.addActionListener(actionEvent -> {
-			frame.dispose();
-		});
+		jButtonCancel.addActionListener(actionEvent -> dispose());
 		return jButtonCancel;
 	}
 	
@@ -2385,5 +2383,5 @@ public class InventoryEdit extends ModalJFrame {
 			return true;
 		}
 		return false;
-	}	
+	}
 }
