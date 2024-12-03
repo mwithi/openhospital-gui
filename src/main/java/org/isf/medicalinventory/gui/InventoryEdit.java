@@ -1048,7 +1048,7 @@ public class InventoryEdit extends ModalJFrame {
 							fireInventoryUpdated();
 							adjustWidth();
 						} catch (OHServiceException e1) {
-							OHServiceExceptionUtil.showMessages(e);
+							OHServiceExceptionUtil.showMessages(e1);
 						}
 					}
 				}
@@ -1903,12 +1903,14 @@ public class InventoryEdit extends ModalJFrame {
 	private JLabel getStatusLabel() {
 		if (statusLabel == null) {
 			if (inventory == null) {
-				String currentStatus = InventoryStatus.draft.toString().toUpperCase();
-				statusLabel = new JLabel(currentStatus);
+				String currentStatus = InventoryStatus.draft.toString();
+				String status = medicalInventoryManager.getStatusByKey(currentStatus);
+				statusLabel = new JLabel(status.toUpperCase());
 				statusLabel.setForeground(Color.GRAY);
 			} else {
-				String currentStatus = inventory.getStatus().toUpperCase();
-				statusLabel = new JLabel(currentStatus);
+				String currentStatus = inventory.getStatus();
+				String status = medicalInventoryManager.getStatusByKey(currentStatus);
+				statusLabel = new JLabel(status.toUpperCase());
 				if (currentStatus.equalsIgnoreCase(InventoryStatus.draft.toString())) {
 					statusLabel.setForeground(Color.GRAY);
 				}
