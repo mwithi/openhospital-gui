@@ -205,7 +205,7 @@ public class InventoryEdit extends ModalJFrame {
 	private boolean[] pColumnVisible = { false, true, true, true, !GeneralData.AUTOMATICLOT_IN, true, true, true, GeneralData.LOTWITHCOST,
 			GeneralData.LOTWITHCOST };
 	private MedicalInventory inventory = null;
-	private JRadioButton specificRadio;
+	private JLabel specificRadio;
 	private JLabel dateInventoryLabel;
 	private JTextField codeTextField;
 	private String code = null;
@@ -307,7 +307,6 @@ public class InventoryEdit extends ModalJFrame {
 			confirmButton.setVisible(false);
 			deleteButton.setVisible(false);
 			columnEditable = columnEditableView;
-			codeTextField.setEditable(false);
 			resetButton.setVisible(false);
 			referenceTextField.setEditable(false);
 			jCalendarInventory.setEnabled(false);
@@ -322,7 +321,6 @@ public class InventoryEdit extends ModalJFrame {
 			saveButton.setVisible(true);
 			validateButton.setVisible(true);
 			deleteButton.setVisible(true);
-			codeTextField.setEditable(true);
 			resetButton.setVisible(true);
 			referenceTextField.setEditable(true);
 			jCalendarInventory.setEnabled(true);
@@ -510,7 +508,6 @@ public class InventoryEdit extends ModalJFrame {
 			selectButton = new JButton(MessageBundle.getMessage("angal.common.select.btn"));
 			selectButton.setMnemonic(MessageBundle.getMnemonic("angal.common.select.btn.key"));
 			selectButton.addActionListener(actionEvent -> {
-				specificRadio.setSelected(false);
 				mainPanel = new JPanel();
 				mainPanel.setLayout(new BorderLayout(10, 10));
 
@@ -677,13 +674,6 @@ public class InventoryEdit extends ModalJFrame {
 									if (confirmButton.isEnabled()) {
 										confirmButton.setEnabled(false);
 									}
-									if (areAllMedicalsInInventory()) {
-										specificRadio.setSelected(false);
-										codeTextField.setEnabled(false);
-									} else {
-										specificRadio.setSelected(true);
-										codeTextField.setEnabled(true);
-									}
 									resetVariable();
 								} else {
 									MessageDialog.error(null, "angal.inventory.update.error.msg");
@@ -699,13 +689,6 @@ public class InventoryEdit extends ModalJFrame {
 								validateButton.setEnabled(true);
 								if (confirmButton.isEnabled()) {
 									confirmButton.setEnabled(false);
-								}
-								if (areAllMedicalsInInventory()) {
-									specificRadio.setSelected(false);
-									codeTextField.setEnabled(false);
-								} else {
-									specificRadio.setSelected(true);
-									codeTextField.setEnabled(true);
 								}
 								resetVariable();
 							} else {
@@ -761,11 +744,6 @@ public class InventoryEdit extends ModalJFrame {
 						resetVariable();
 						fireInventoryUpdated();
 						validateButton.setEnabled(true);
-						if (areAllMedicalsInInventory()) {
-							specificRadio.setSelected(false);
-						} else {
-							specificRadio.setSelected(true);
-						}
 					}
 				}
 				inventoryRowSearchList = newMedicalInventoryRows;
@@ -970,8 +948,6 @@ public class InventoryEdit extends ModalJFrame {
 				} catch (OHServiceException e) {
 					OHServiceExceptionUtil.showMessages(e);
 				}
-				specificRadio.setSelected(true);
-				codeTextField.setEnabled(true);
 				inventoryRowSearchList = new ArrayList<>();
 				DefaultTableModel model = (DefaultTableModel) jTableInventoryRow.getModel();
 				model.setRowCount(0);
@@ -1212,13 +1188,6 @@ public class InventoryEdit extends ModalJFrame {
 					addMedInRowInInventorySearchList(invRow);
 				}
 			}
-			if (areAllMedicalsInInventory()) {
-				specificRadio.setSelected(false);
-				codeTextField.setEnabled(false);
-			} else {
-				specificRadio.setSelected(true);
-				codeTextField.setEnabled(true);
-			}
 		}
 
 		public InventoryRowModel() throws OHServiceException {
@@ -1237,13 +1206,6 @@ public class InventoryEdit extends ModalJFrame {
 					}
 				}
 			}
-			if (areAllMedicalsInInventory()) {
-				specificRadio.setSelected(false);
-				codeTextField.setEnabled(false);
-			} else {
-				specificRadio.setSelected(true);
-				codeTextField.setEnabled(true);
-			}
 		}
 
 		public InventoryRowModel(MedicalType medType) throws OHServiceException {
@@ -1253,13 +1215,6 @@ public class InventoryEdit extends ModalJFrame {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
 					addMedInRowInInventorySearchList(invRow);
 				}
-			}
-			if (areAllMedicalsInInventory()) {
-				specificRadio.setSelected(false);
-				codeTextField.setEnabled(false);
-			} else {
-				specificRadio.setSelected(true);
-				codeTextField.setEnabled(true);
 			}
 		}
 
@@ -1273,13 +1228,6 @@ public class InventoryEdit extends ModalJFrame {
 			} else {
 				MessageDialog.info(null, "angal.invetory.notdataforthatfilter.msg");
 			}
-			if (areAllMedicalsInInventory()) {
-				specificRadio.setSelected(false);
-				codeTextField.setEnabled(false);
-			} else {
-				specificRadio.setSelected(true);
-				codeTextField.setEnabled(true);
-			}
 		}
 
 		public InventoryRowModel(MedicalType medType, boolean withMovement) throws OHServiceException {
@@ -1291,13 +1239,6 @@ public class InventoryEdit extends ModalJFrame {
 				}
 			} else {
 				MessageDialog.info(null, "angal.invetory.notdataforthatfilter.msg");
-			}
-			if (areAllMedicalsInInventory()) {
-				specificRadio.setSelected(false);
-				codeTextField.setEnabled(false);
-			} else {
-				specificRadio.setSelected(true);
-				codeTextField.setEnabled(true);
 			}
 		}
 
@@ -1601,15 +1542,9 @@ public class InventoryEdit extends ModalJFrame {
 		this.inventory = inventory;
 	}
 
-	private JRadioButton getSpecificRadio() {
+	private JLabel getSpecificRadio() {
 		if (specificRadio == null) {
-			specificRadio = new JRadioButton(MessageBundle.getMessage("angal.inventory.specificproduct.txt"));
-			specificRadio.addActionListener(actionEvent -> {
-				if (specificRadio.isSelected()) {
-					codeTextField.setEnabled(true);
-					codeTextField.setText("");
-				}
-			});
+			specificRadio = new JLabel(MessageBundle.getMessage("angal.inventory.specificproduct.txt"));
 		}
 		return specificRadio;
 	}
@@ -1624,11 +1559,6 @@ public class InventoryEdit extends ModalJFrame {
 	private JTextField getCodeTextField() {
 		if (codeTextField == null) {
 			codeTextField = new JTextField();
-			if (inventory != null) {
-				codeTextField.setEnabled(false);
-			} else {
-				codeTextField.setEnabled(true);
-			}
 			codeTextField.setColumns(10);
 			TextPrompt suggestion = new TextPrompt(MessageBundle.getMessage("angal.common.code.txt"), codeTextField, Show.FOCUS_LOST);
 			suggestion.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -2204,7 +2134,7 @@ public class InventoryEdit extends ModalJFrame {
 			jButtonCancel = new JButton(MessageBundle.getMessage("angal.common.cancel.btn"));
 			jButtonCancel.setMnemonic(MessageBundle.getMnemonic("angal.common.cancel.btn.key"));
 		}
-		jButtonCancel.addActionListener(actionEvent -> dispose());
+		jButtonCancel.addActionListener(actionEvent -> frame.dispose());
 		return jButtonCancel;
 	}
 	
@@ -2251,10 +2181,8 @@ public class InventoryEdit extends ModalJFrame {
 								}
 								fireInventoryUpdated();
 								adjustWidth();
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.invetory.allmedicaladdedsuccessfully.msg");
 							} else {
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 							}
 						} else {
@@ -2270,10 +2198,8 @@ public class InventoryEdit extends ModalJFrame {
 								}
 								fireInventoryUpdated();
 								adjustWidth();
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 							} else {
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 							}
 						}
@@ -2292,12 +2218,10 @@ public class InventoryEdit extends ModalJFrame {
 								}
 								fireInventoryUpdated();
 								adjustWidth();
-								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
 									MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 								}
 							} else {
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 							}
 						} else {
@@ -2312,12 +2236,10 @@ public class InventoryEdit extends ModalJFrame {
 								}
 								fireInventoryUpdated();
 								adjustWidth();
-								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
 									MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 								}
 							} else {
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 							}
 						}
@@ -2336,12 +2258,10 @@ public class InventoryEdit extends ModalJFrame {
 								}
 								fireInventoryUpdated();
 								adjustWidth();
-								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
 									MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 								}
 							} else {
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 							}
 						} else {
@@ -2356,16 +2276,15 @@ public class InventoryEdit extends ModalJFrame {
 								}
 								fireInventoryUpdated();
 								adjustWidth();
-								jButtonCancel.doClick();
 								if (!inventoryRowList.isEmpty()) {
 									MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 								}
 							} else {
-								jButtonCancel.doClick();
 								MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 							}
 						}
 					}
+					jButtonCancel.doClick();
 				} catch (OHServiceException e) {
 					OHServiceExceptionUtil.showMessages(e);
 				}
