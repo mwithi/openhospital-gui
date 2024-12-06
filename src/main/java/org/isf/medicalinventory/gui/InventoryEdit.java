@@ -44,6 +44,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractButton;
@@ -78,6 +80,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import org.hibernate.internal.build.AllowSysOut;
 import org.isf.generaldata.GeneralData;
 import org.isf.generaldata.MessageBundle;
 import org.isf.medicalinventory.manager.MedicalInventoryManager;
@@ -528,11 +531,13 @@ public class InventoryEdit extends ModalJFrame {
 				
 				// Map actions to buttons
 				initialiseActions();
-				
+				// Convertir la HashMap en TreeMap pour trier les clés
+				Map<AbstractButton, Runnable> sortedActionMap = new TreeMap<>(Comparator.comparing(AbstractButton::getText));
+				sortedActionMap.putAll(actions);
 				// Add ActionListener to each button
-		        for (AbstractButton button : actions.keySet()) {
-		            rightPanel.add(button);
-		        }
+				 sortedActionMap.forEach((key, value) ->  {
+		            rightPanel.add(key);
+		        });
 
 				JPanel bottomPanel = new JPanel();
 				bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -2114,7 +2119,7 @@ public class InventoryEdit extends ModalJFrame {
 	private JRadioButton getAllRadioButton() {
 		if (radioButtonAll == null) {
 			radioButtonAll = new JRadioButton(MessageBundle.getMessage("angal.common.all.btn"));
-			radioButtonAll.setMnemonic(MessageBundle.getMnemonic("angal.common.all.btn.key"));
+			radioButtonAll.setSelected(true);
 		}
 		return radioButtonAll;
 	}
@@ -2122,7 +2127,6 @@ public class InventoryEdit extends ModalJFrame {
 	private JRadioButton getMedicalWithNonZeroQuantityRadioButton() {
 		if (radioOnlyNonZero == null) {
 			radioOnlyNonZero = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithonlynonzeroqty.btn"));
-			radioOnlyNonZero.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithonlynonzeroqty.btn.key"));
 		}
 		return radioOnlyNonZero;
 	}
@@ -2130,7 +2134,6 @@ public class InventoryEdit extends ModalJFrame {
 	private JRadioButton getMedicalWithMovementRadioButton() {
 		if (radioWithMovement == null) {
 			radioWithMovement = new JRadioButton(MessageBundle.getMessage("angal.inventory.medicalwithmovementonly.btn"));
-			radioWithMovement.setMnemonic(MessageBundle.getMnemonic("angal.inventory.medicalwithmovementonly.btn.key"));
 		}
 		return radioWithMovement;
 	}
@@ -2172,11 +2175,11 @@ public class InventoryEdit extends ModalJFrame {
 			jButtonOk = new JButton(MessageBundle.getMessage("angal.common.ok.btn"));
 			jButtonOk.setMnemonic(MessageBundle.getMnemonic("angal.common.ok.btn.key"));
 			jButtonOk.addActionListener(actionEvent -> {
-				for (AbstractButton button : actions.keySet()) {
-	                if (button.isSelected()) {
-	                    actions.get(button).run();
+				actions.forEach((key, value) -> {
+	                if (key.isSelected()) {
+	                    actions.get(key).run();
 	                }
-	            }
+	            });
 				jButtonCancel.doClick();
 			});
 		}
