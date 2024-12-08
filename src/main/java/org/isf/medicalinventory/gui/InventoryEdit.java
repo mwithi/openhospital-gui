@@ -2197,7 +2197,7 @@ public class InventoryEdit extends ModalJFrame {
 		return false;
 	}
 	
-	private void initialiseActions() {
+	private void initializeActions() {
 		actions.put(radioButtonAll, () -> {
 			if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
 				try {
