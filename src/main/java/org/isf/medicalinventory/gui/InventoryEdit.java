@@ -535,7 +535,7 @@ public class InventoryEdit extends ModalJFrame {
 				Map<AbstractButton, Runnable> sortedActionMap = new TreeMap<>(Comparator.comparing(AbstractButton::getText));
 				sortedActionMap.putAll(actions);
 				// Add ActionListener to each button
-				 sortedActionMap.forEach((key, value) ->  {
+				sortedActionMap.forEach((key, value) ->  {
 		            rightPanel.add(key);
 		        });
 
