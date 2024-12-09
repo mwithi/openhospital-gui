@@ -530,7 +530,7 @@ public class InventoryEdit extends ModalJFrame {
 				radioGroup.add(getMedicalWithMovementRadioButton());
 				
 				// Map actions to buttons
-				initialiseActions();
+				initializeActions();
 				// Convertir la HashMap en TreeMap pour trier les clés
 				Map<AbstractButton, Runnable> sortedActionMap = new TreeMap<>(Comparator.comparing(AbstractButton::getText));
 				sortedActionMap.putAll(actions);
@@ -2062,6 +2062,7 @@ public class InventoryEdit extends ModalJFrame {
 
 		return found;
 	}
+	
 	private void addMedInRowInInventorySearchList(MedicalInventoryRow inventoryRow) {
 		int position = getPosition(inventoryRow);
 		if (position == -1) {
@@ -2074,6 +2075,7 @@ public class InventoryEdit extends ModalJFrame {
 			inventoryRowListAdded.add(inventoryRow);
 		}
 	}
+	
 	private void resetVariable() {
 		inventoryRowsToDelete.clear();
 		lotsDeleted.clear();
