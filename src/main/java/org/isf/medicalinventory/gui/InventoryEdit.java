@@ -1202,9 +1202,7 @@ public class InventoryEdit extends ModalJFrame {
 
 		public InventoryRowModel() throws OHServiceException {
 			inventoryRowList.clear();
-			if (!inventoryRowSearchList.isEmpty()) {
-				inventoryRowSearchList.clear();
-			}
+			inventoryRowSearchList.clear();
 			if (inventory != null) {
 				inventoryRowList = medicalInventoryRowManager.getMedicalInventoryRowByInventoryId(inventory.getId());
 			}
