@@ -530,9 +530,11 @@ public class InventoryEdit extends ModalJFrame {
 
 				// Map actions to buttons
 				initialiseActions();
-				// Convertir la HashMap en TreeMap pour trier les clés
+
+				// Convert HashMap to TreeMap to sort keys
 				Map<AbstractButton, Runnable> sortedActionMap = new TreeMap<>(Comparator.comparing(AbstractButton::getText));
 				sortedActionMap.putAll(actions);
+
 				// Add ActionListener to each button
 				sortedActionMap.forEach((key, value) -> {
 					rightPanel.add(key);
@@ -1191,7 +1193,6 @@ public class InventoryEdit extends ModalJFrame {
 		private static final long serialVersionUID = 1L;
 
 		public InventoryRowModel(boolean add) throws OHServiceException {
-			inventoryRowList.clear();
 			inventoryRowList = loadNewInventoryTable(null, inventory, add);
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
@@ -1202,9 +1203,7 @@ public class InventoryEdit extends ModalJFrame {
 
 		public InventoryRowModel() throws OHServiceException {
 			inventoryRowList.clear();
-			if (!inventoryRowSearchList.isEmpty()) {
-				inventoryRowSearchList.clear();
-			}
+			inventoryRowSearchList.clear();
 			if (inventory != null) {
 				inventoryRowList = medicalInventoryRowManager.getMedicalInventoryRowByInventoryId(inventory.getId());
 			}
@@ -1219,7 +1218,6 @@ public class InventoryEdit extends ModalJFrame {
 		}
 
 		public InventoryRowModel(MedicalType medType) throws OHServiceException {
-			inventoryRowList.clear();
 			inventoryRowList = loadNewInventoryTableByMedicalType(medType);
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
@@ -1229,7 +1227,6 @@ public class InventoryEdit extends ModalJFrame {
 		}
 
 		public InventoryRowModel(boolean withNoZeroQty, MedicalType medType) throws OHServiceException {
-			inventoryRowList.clear();
 			inventoryRowList = loadNewInventoryTable(withNoZeroQty, medType);
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
@@ -1241,7 +1238,6 @@ public class InventoryEdit extends ModalJFrame {
 		}
 
 		public InventoryRowModel(MedicalType medType, boolean withMovement) throws OHServiceException {
-			inventoryRowList.clear();
 			inventoryRowList = loadNewInventoryTable(medType);
 			if (!inventoryRowList.isEmpty()) {
 				for (MedicalInventoryRow invRow : inventoryRowList) {
