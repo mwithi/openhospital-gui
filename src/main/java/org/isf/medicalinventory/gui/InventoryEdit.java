@@ -1119,9 +1119,9 @@ public class InventoryEdit extends ModalJFrame {
 			jTableInventoryRow = new JTable();
 			jTextFieldEditor = new JTextField();
 			jTableInventoryRow.setFillsViewportHeight(true);
-			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
 			model = new InventoryRowModel();
 			jTableInventoryRow.setModel(model);
+			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
 			for (int i = 0; i < pColumnVisible.length; i++) {
 				jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new EnabledTableCellRenderer());
 				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
