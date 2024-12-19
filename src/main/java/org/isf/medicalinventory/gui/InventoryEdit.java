@@ -800,7 +800,6 @@ public class InventoryEdit extends ModalJFrame {
 					}
 				}
 				jTableInventoryRow.clearSelection();
-				adjustWidth();
 			} else {
 				return;
 			}
@@ -965,7 +964,6 @@ public class InventoryEdit extends ModalJFrame {
 				model.setRowCount(0);
 				model.setColumnCount(0);
 				jTableInventoryRow.updateUI();
-				adjustWidth();
 			}
 		});
 		return resetButton;
@@ -1034,7 +1032,6 @@ public class InventoryEdit extends ModalJFrame {
 							confirmButton.setEnabled(true);
 							jTableInventoryRow.setModel(new InventoryRowModel());
 							fireInventoryUpdated();
-							adjustWidth();
 						} catch (OHServiceException e1) {
 							OHServiceExceptionUtil.showMessages(e1);
 						}
@@ -1122,6 +1119,7 @@ public class InventoryEdit extends ModalJFrame {
 			jTableInventoryRow = new JTable();
 			jTextFieldEditor = new JTextField();
 			jTableInventoryRow.setFillsViewportHeight(true);
+			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
 			model = new InventoryRowModel();
 			jTableInventoryRow.setModel(model);
 			for (int i = 0; i < pColumnVisible.length; i++) {
@@ -1379,20 +1377,6 @@ public class InventoryEdit extends ModalJFrame {
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return columnEditable[columnIndex];
 		}
-	}
-
-	private void adjustWidth() {
-		for (int i = 0; i < jTableInventoryRow.getColumnModel().getColumnCount(); i++) {
-			jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
-			if (i == 0 || !pColumnVisible[i]) {
-				jTableInventoryRow.getColumnModel().getColumn(i).setMinWidth(0);
-				jTableInventoryRow.getColumnModel().getColumn(i).setMaxWidth(0);
-				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(0);
-			}
-		}
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-		jTableInventoryRow.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
 	}
 
 	private Lot getLot(Lot lotToUpdate) throws OHServiceException {
@@ -2206,7 +2190,6 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(true));
 						}
 						fireInventoryUpdated();
-						adjustWidth();
 						MessageDialog.info(null, "angal.invetory.allmedicaladdedsuccessfully.msg");
 					} else {
 						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
@@ -2225,7 +2208,6 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(medType));
 						}
 						fireInventoryUpdated();
-						adjustWidth();
 						MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 					} else {
 						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
@@ -2247,7 +2229,6 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(true, null));
 						}
 						fireInventoryUpdated();
-						adjustWidth();
 						if (!inventoryRowList.isEmpty()) {
 							MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 						}
@@ -2267,7 +2248,6 @@ public class InventoryEdit extends ModalJFrame {
 							MedicalType medType = (MedicalType) medicalTypeComboBox.getSelectedItem();
 							jTableInventoryRow.setModel(new InventoryRowModel(true, medType));
 							fireInventoryUpdated();
-							adjustWidth();
 							if (!inventoryRowList.isEmpty()) {
 								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 							}
@@ -2291,7 +2271,6 @@ public class InventoryEdit extends ModalJFrame {
 						if (info == JOptionPane.YES_OPTION) {
 							jTableInventoryRow.setModel(new InventoryRowModel(null, true));
 							fireInventoryUpdated();
-							adjustWidth();
 							if (!inventoryRowList.isEmpty()) {
 								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 							}
@@ -2312,7 +2291,6 @@ public class InventoryEdit extends ModalJFrame {
 							MedicalType medType = (MedicalType) medicalTypeComboBox.getSelectedItem();
 							jTableInventoryRow.setModel(new InventoryRowModel(medType, true));
 							fireInventoryUpdated();
-							adjustWidth();
 							if (!inventoryRowList.isEmpty()) {
 								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
 							}
