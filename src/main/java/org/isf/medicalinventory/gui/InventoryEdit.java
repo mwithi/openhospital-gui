@@ -529,7 +529,7 @@ public class InventoryEdit extends ModalJFrame {
 				radioGroup.add(getMedicalWithMovementRadioButton());
 
 				// Map actions to buttons
-				initialiseActions();
+				initializeActions();
 
 				// Convert HashMap to TreeMap to sort keys
 				Map<AbstractButton, Runnable> sortedActionMap = new TreeMap<>(Comparator.comparing(AbstractButton::getText));
@@ -1201,7 +1201,7 @@ public class InventoryEdit extends ModalJFrame {
 
 		public InventoryRowModel() throws OHServiceException {
 			inventoryRowList.clear();
-			inventoryRowSearchList.clear();
+      inventoryRowSearchList.clear();
 			if (inventory != null) {
 				inventoryRowList = medicalInventoryRowManager.getMedicalInventoryRowByInventoryId(inventory.getId());
 			}
@@ -2178,7 +2178,7 @@ public class InventoryEdit extends ModalJFrame {
 		return false;
 	}
 
-	private void initialiseActions() {
+	private void initializeActions() {
 		actions.put(radioButtonAll, () -> {
 			if (medicalTypeSelected.getDescription().equals(MessageBundle.getMessage("angal.common.all.txt"))) {
 				try {
