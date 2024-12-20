@@ -192,7 +192,7 @@ public class InventoryEdit extends ModalJFrame {
 	private List<Lot> lotsSaved = new ArrayList<>();
 	private HashMap<Integer, Lot> lotsDeleted = new HashMap<>();
 	List<MedicalInventoryRow> inventoryRowsToDelete = new ArrayList<>();
-	private String[] pColums = { MessageBundle.getMessage("angal.inventory.id.col").toUpperCase(),
+	private String[] columsNames = { MessageBundle.getMessage("angal.inventory.id.col").toUpperCase(),
 			MessageBundle.getMessage("angal.common.code.txt").toUpperCase(),
 			MessageBundle.getMessage("angal.inventory.product.col").toUpperCase(),
 			MessageBundle.getMessage("angal.inventory.newlot.col").toUpperCase(),
@@ -202,7 +202,7 @@ public class InventoryEdit extends ModalJFrame {
 			MessageBundle.getMessage("angal.inventoryrow.realqty.col").toUpperCase(),
 			MessageBundle.getMessage("angal.inventoryrow.unitcost.col").toUpperCase(),
 			MessageBundle.getMessage("angal.inventoryrow.totalcost.col").toUpperCase() };
-	private int[] pColumwidth = { 50, 50, 200, 100, 100, 100, 100, 80, 80, 80 };
+	private int[] columwidth = { 50, 50, 200, 100, 100, 100, 100, 80, 80, 80 };
 	private boolean[] columnEditable = { false, false, false, false, false, false, false, true, false, false };
 	private boolean[] columnEditableView = { false, false, false, false, false, false, false, false, false, false };
 	private boolean[] columnVisible = { false, true, true, true, !GeneralData.AUTOMATICLOT_IN, true, true, true, GeneralData.LOTWITHCOST,
@@ -1127,7 +1127,7 @@ public class InventoryEdit extends ModalJFrame {
 			jTableInventoryRow.setModel(model);
 			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
 			for (int i = 0; i < columnVisible.length; i++) {
-				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
+				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(columwidth[i]);
 				if (!columnVisible[i]) {
 					jTableInventoryRow.getColumnModel().getColumn(i).setMinWidth(0);
 					jTableInventoryRow.getColumnModel().getColumn(i).setMaxWidth(0);
@@ -1253,11 +1253,11 @@ public class InventoryEdit extends ModalJFrame {
 		}
 
 		public String getColumnName(int c) {
-			return pColums[c];
+			return columsNames[c];
 		}
 
 		public int getColumnCount() {
-			return pColums.length;
+			return columsNames.length;
 		}
 
 		public Object getValueAt(int r, int c) {
