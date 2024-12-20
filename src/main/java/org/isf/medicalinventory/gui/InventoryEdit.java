@@ -200,12 +200,12 @@ public class InventoryEdit extends ModalJFrame {
 			MessageBundle.getMessage("angal.medicalstock.duedate.col").toUpperCase(),
 			MessageBundle.getMessage("angal.inventoryrow.theoreticqty.col").toUpperCase(),
 			MessageBundle.getMessage("angal.inventoryrow.realqty.col").toUpperCase(),
-			MessageBundle.getMessage("angal.inventoryrow.unitprice.col").toUpperCase(),
-			MessageBundle.getMessage("angal.inventory.totalprice").toUpperCase() };
+			MessageBundle.getMessage("angal.inventoryrow.unitcost.col").toUpperCase(),
+			MessageBundle.getMessage("angal.inventoryrow.totalcost.col").toUpperCase() };
 	private int[] pColumwidth = { 50, 50, 200, 100, 100, 100, 100, 80, 80, 80 };
 	private boolean[] columnEditable = { false, false, false, false, false, false, false, true, false, false };
 	private boolean[] columnEditableView = { false, false, false, false, false, false, false, false, false, false };
-	private boolean[] pColumnVisible = { false, true, true, true, !GeneralData.AUTOMATICLOT_IN, true, true, true, GeneralData.LOTWITHCOST,
+	private boolean[] columnVisible = { false, true, true, true, !GeneralData.AUTOMATICLOT_IN, true, true, true, GeneralData.LOTWITHCOST,
 			GeneralData.LOTWITHCOST };
 	private boolean[] columnCentered = { false, false, false, true, true, true, true, true, true, true };
 	private boolean[] columnDecimalNumber = { false, false, false, false, false, false, false, false, true, true };
@@ -1126,9 +1126,9 @@ public class InventoryEdit extends ModalJFrame {
 			model = new InventoryRowModel();
 			jTableInventoryRow.setModel(model);
 			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
-			for (int i = 0; i < pColumnVisible.length; i++) {
+			for (int i = 0; i < columnVisible.length; i++) {
 				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
-				if (!pColumnVisible[i]) {
+				if (!columnVisible[i]) {
 					jTableInventoryRow.getColumnModel().getColumn(i).setMinWidth(0);
 					jTableInventoryRow.getColumnModel().getColumn(i).setMaxWidth(0);
 					jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(0);
