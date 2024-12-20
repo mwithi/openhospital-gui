@@ -528,16 +528,18 @@ public class InventoryEdit extends ModalJFrame {
 				radioGroup.add(getAllRadioButton());
 				radioGroup.add(getMedicalWithNonZeroQuantityRadioButton());
 				radioGroup.add(getMedicalWithMovementRadioButton());
-				
+
 				// Map actions to buttons
 				initializeActions();
-				// Convertir la HashMap en TreeMap pour trier les clés
+
+				// Convert HashMap to TreeMap to sort keys
 				Map<AbstractButton, Runnable> sortedActionMap = new TreeMap<>(Comparator.comparing(AbstractButton::getText));
 				sortedActionMap.putAll(actions);
+
 				// Add ActionListener to each button
-				sortedActionMap.forEach((key, value) ->  {
-		            rightPanel.add(key);
-		        });
+				sortedActionMap.forEach((key, value) -> {
+					rightPanel.add(key);
+				});
 
 				JPanel bottomPanel = new JPanel();
 				bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -799,7 +801,6 @@ public class InventoryEdit extends ModalJFrame {
 					}
 				}
 				jTableInventoryRow.clearSelection();
-				adjustWidth();
 			} else {
 				return;
 			}
@@ -849,7 +850,7 @@ public class InventoryEdit extends ModalJFrame {
 				code = lot.getCode();
 				if (selectedInventoryRow.getLot() == null) {
 					List<MedicalInventoryRow> invRows = inventoryRowSearchList.stream()
-									.filter(inv -> inv.getLot() != null && inv.getLot().getCode().equals(code)).collect(Collectors.toList());
+						.filter(inv -> inv.getLot() != null && inv.getLot().getCode().equals(code)).collect(Collectors.toList());
 					if (invRows.isEmpty() || code.equals("")) {
 						selectedInventoryRow.setNewLot(true);
 						selectedInventoryRow.setLot(lot);
@@ -865,7 +866,7 @@ public class InventoryEdit extends ModalJFrame {
 					}
 				} else {
 					List<MedicalInventoryRow> invRows = inventoryRowSearchList.stream()
-									.filter(inv -> inv.getMedical().getCode().equals(selectedInventoryRow.getMedical().getCode())).collect(Collectors.toList());
+						.filter(inv -> inv.getMedical().getCode().equals(selectedInventoryRow.getMedical().getCode())).collect(Collectors.toList());
 					invRows = invRows.stream().filter(inv -> inv.getLot() != null && inv.getLot().getCode().equals(code)).collect(Collectors.toList());
 					if (invRows.isEmpty() || code.equals("")) {
 						selectedInventoryRow.setNewLot(true);
@@ -961,7 +962,6 @@ public class InventoryEdit extends ModalJFrame {
 				model.setRowCount(0);
 				model.setColumnCount(0);
 				jTableInventoryRow.updateUI();
-				adjustWidth();
 			}
 		});
 		return resetButton;
@@ -992,7 +992,7 @@ public class InventoryEdit extends ModalJFrame {
 				String lastReference = inventory.getInventoryReference();
 				LocalDateTime lastDate = inventory.getInventoryDate();
 				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate) || !lotsSaved.isEmpty()
-								|| !inventoryRowListAdded.isEmpty() || !inventoryRowsToDelete.isEmpty()) {
+					|| !inventoryRowListAdded.isEmpty() || !inventoryRowsToDelete.isEmpty()) {
 					saveButton.doClick();
 					chargeCode = inventory.getChargeType();
 					dischargeCode = inventory.getDischargeType();
@@ -1030,7 +1030,6 @@ public class InventoryEdit extends ModalJFrame {
 							confirmButton.setEnabled(true);
 							jTableInventoryRow.setModel(new InventoryRowModel());
 							fireInventoryUpdated();
-							adjustWidth();
 						} catch (OHServiceException e1) {
 							OHServiceExceptionUtil.showMessages(e1);
 						}
@@ -1120,6 +1119,7 @@ public class InventoryEdit extends ModalJFrame {
 			jTableInventoryRow.setFillsViewportHeight(true);
 			model = new InventoryRowModel();
 			jTableInventoryRow.setModel(model);
+			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
 			for (int i = 0; i < pColumnVisible.length; i++) {
 				jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new EnabledTableCellRenderer());
 				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
@@ -1372,20 +1372,6 @@ public class InventoryEdit extends ModalJFrame {
 		}
 	}
 
-	private void adjustWidth() {
-		for (int i = 0; i < jTableInventoryRow.getColumnModel().getColumnCount(); i++) {
-			jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
-			if (i == 0 || !pColumnVisible[i]) {
-				jTableInventoryRow.getColumnModel().getColumn(i).setMinWidth(0);
-				jTableInventoryRow.getColumnModel().getColumn(i).setMaxWidth(0);
-				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(0);
-			}
-		}
-		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-		jTableInventoryRow.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-	}
-
 	private Lot getLot(Lot lotToUpdate) throws OHServiceException {
 		Lot lot = null;
 		if (isAutomaticLotIn()) {
@@ -1437,10 +1423,10 @@ public class InventoryEdit extends ModalJFrame {
 		panel.add(expireDateChooser);
 		do {
 			int ok = JOptionPane.showConfirmDialog(
-							this,
-							panel,
-							MessageBundle.getMessage("angal.medicalstock.multiplecharging.lotinformations"),
-							JOptionPane.OK_CANCEL_OPTION);
+				this,
+				panel,
+				MessageBundle.getMessage("angal.medicalstock.multiplecharging.lotinformations"),
+				JOptionPane.OK_CANCEL_OPTION);
 
 			if (ok == JOptionPane.OK_OPTION) {
 				String lotName = lotNameTextField.getText();
@@ -1475,8 +1461,8 @@ public class InventoryEdit extends ModalJFrame {
 		double cost = 0.;
 		do {
 			String input = JOptionPane.showInputDialog(this,
-							MessageBundle.getMessage("angal.medicalstock.multiplecharging.unitcost"),
-							lastCost);
+				MessageBundle.getMessage("angal.medicalstock.multiplecharging.unitcost"),
+				lastCost);
 			if (input != null) {
 				try {
 					cost = Double.parseDouble(input);
@@ -1504,8 +1490,8 @@ public class InventoryEdit extends ModalJFrame {
 		panel.add(expireDateChooser);
 
 		int ok = JOptionPane.showConfirmDialog(this, panel,
-						MessageBundle.getMessage("angal.medicalstock.multiplecharging.expiringdate"),
-						JOptionPane.OK_CANCEL_OPTION);
+			MessageBundle.getMessage("angal.medicalstock.multiplecharging.expiringdate"),
+			JOptionPane.OK_CANCEL_OPTION);
 
 		if (ok == JOptionPane.OK_OPTION) {
 			date = expireDateChooser.getLocalDateTime();
@@ -1515,8 +1501,8 @@ public class InventoryEdit extends ModalJFrame {
 
 	protected double askTotalCost() {
 		String input = JOptionPane.showInputDialog(this,
-						MessageBundle.getMessage("angal.medicalstock.multiplecharging.totalcost"),
-						0.);
+			MessageBundle.getMessage("angal.medicalstock.multiplecharging.totalcost"),
+			0.);
 		double total = 0.;
 		if (input != null) {
 			try {
@@ -2029,7 +2015,7 @@ public class InventoryEdit extends ModalJFrame {
 	private boolean existInInventorySearchList(MedicalInventoryRow inventoryRow) {
 		boolean found = false;
 		List<MedicalInventoryRow> invRows = inventoryRowSearchList.stream()
-						.filter(inv -> inv.getMedical().getCode().equals(inventoryRow.getMedical().getCode())).collect(Collectors.toList());
+			.filter(inv -> inv.getMedical().getCode().equals(inventoryRow.getMedical().getCode())).collect(Collectors.toList());
 		if (!invRows.isEmpty()) {
 			for (MedicalInventoryRow invR : invRows) {
 				if (inventoryRow.getLot() != null && invR.getLot() != null) {
@@ -2048,7 +2034,7 @@ public class InventoryEdit extends ModalJFrame {
 
 		return found;
 	}
-	
+
 	private void addMedInRowInInventorySearchList(MedicalInventoryRow inventoryRow) {
 		int position = getPosition(inventoryRow);
 		if (position == -1) {
@@ -2061,7 +2047,7 @@ public class InventoryEdit extends ModalJFrame {
 			inventoryRowListAdded.add(inventoryRow);
 		}
 	}
-	
+
 	private void resetVariable() {
 		inventoryRowsToDelete.clear();
 		lotsDeleted.clear();
@@ -2071,13 +2057,13 @@ public class InventoryEdit extends ModalJFrame {
 
 	private boolean checkParameters(String wardCode, String chargeCode, String dischargeCode, Integer suplierId, String reference, LocalDateTime date) {
 		if (!lotsSaved.isEmpty() || !inventoryRowListAdded.isEmpty() || !lotsDeleted.isEmpty() || !inventoryRowsToDelete.isEmpty()
-						|| (destination != null && !destination.getCode().equals(wardCode))
-						|| (chargeType != null && !chargeType.getCode().equals(chargeCode))
-						|| (dischargeType != null && !dischargeType.getCode().equals(dischargeCode))
-						|| (supplier != null && supplier.getSupId() != suplierId) || (destination == null && wardCode != null)
-						|| (chargeType == null && chargeCode != null) || (dischargeType == null && dischargeCode != null)
-						|| (supplier == null && suplierId != null) || (reference != null && !reference.equals(newReference))
-						|| !date.toLocalDate().equals(dateInventory.toLocalDate())) {
+			|| (destination != null && !destination.getCode().equals(wardCode))
+			|| (chargeType != null && !chargeType.getCode().equals(chargeCode))
+			|| (dischargeType != null && !dischargeType.getCode().equals(dischargeCode))
+			|| (supplier != null && supplier.getSupId() != suplierId) || (destination == null && wardCode != null)
+			|| (chargeType == null && chargeCode != null) || (dischargeType == null && dischargeCode != null)
+			|| (supplier == null && suplierId != null) || (reference != null && !reference.equals(newReference))
+			|| !date.toLocalDate().equals(dateInventory.toLocalDate())) {
 			return true;
 		}
 		return false;
@@ -2134,7 +2120,7 @@ public class InventoryEdit extends ModalJFrame {
 		jButtonCancel.addActionListener(actionEvent -> frame.dispose());
 		return jButtonCancel;
 	}
-	
+
 	private List<MedicalInventoryRow> loadNewInventoryTable(boolean withNonZeroQty, MedicalType medicalTypeSelected) throws OHServiceException {
 		List<MedicalInventoryRow> inventoryRowsList = getMedicalInventoryRows(null);
 		if (withNonZeroQty) {
@@ -2142,8 +2128,8 @@ public class InventoryEdit extends ModalJFrame {
 		}
 		if (medicalTypeSelected != null) {
 			inventoryRowsList = inventoryRowsList.stream()
-							.filter(inv -> inv.getMedical().getType().getDescription().equals(medicalTypeSelected.getDescription()))
-							.collect(Collectors.toList());
+				.filter(inv -> inv.getMedical().getType().getDescription().equals(medicalTypeSelected.getDescription()))
+				.collect(Collectors.toList());
 		}
 		return inventoryRowsList;
 	}
@@ -2152,8 +2138,8 @@ public class InventoryEdit extends ModalJFrame {
 		List<MedicalInventoryRow> inventoryRowsList = getMedicalInventoryRowsWithMovement();
 		if (medicalTypeSelected != null) {
 			inventoryRowsList = inventoryRowsList.stream()
-							.filter(inv -> inv.getMedical().getType().getDescription().equals(medicalTypeSelected.getDescription()))
-							.collect(Collectors.toList());
+				.filter(inv -> inv.getMedical().getType().getDescription().equals(medicalTypeSelected.getDescription()))
+				.collect(Collectors.toList());
 		}
 		return inventoryRowsList;
 	}
@@ -2164,16 +2150,16 @@ public class InventoryEdit extends ModalJFrame {
 			jButtonOk.setMnemonic(MessageBundle.getMnemonic("angal.common.ok.btn.key"));
 			jButtonOk.addActionListener(actionEvent -> {
 				actions.forEach((key, value) -> {
-	                if (key.isSelected()) {
-	                    actions.get(key).run();
-	                }
-	            });
+					if (key.isSelected()) {
+						actions.get(key).run();
+					}
+				});
 				jButtonCancel.doClick();
 			});
 		}
 		return jButtonOk;
 	}
-	
+
 	private boolean areAllMedicalsInInventory() throws OHServiceException {
 		Set<Medical> inventorySet = new HashSet<>();
 		for (MedicalInventoryRow row : inventoryRowSearchList) {
@@ -2184,7 +2170,7 @@ public class InventoryEdit extends ModalJFrame {
 		}
 		return false;
 	}
-	
+
 	private void initializeActions() {
 	    actions.put(radioButtonAll, () -> handleInventoryUpdate(true, false, false));
 	    actions.put(radioOnlyNonZero, () -> handleInventoryUpdate(false, false, true));
