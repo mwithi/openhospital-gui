@@ -25,6 +25,7 @@ import static org.isf.utils.Constants.DATE_TIME_FORMATTER;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -53,6 +54,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import org.isf.generaldata.MessageBundle;
@@ -89,11 +91,12 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 	private JButton jButtonView;
 	private JScrollPane scrollPaneInventory;
 	private JTable jTableInventory;
-	private String[] pColums = { MessageBundle.getMessage("angal.common.reference.label").toUpperCase(),
+	private String[] columsNames = { MessageBundle.getMessage("angal.common.reference.label").toUpperCase(),
 			MessageBundle.getMessage("angal.common.date.txt").toUpperCase(),
 			MessageBundle.getMessage("angal.inventory.status.txt").toUpperCase(),
 			MessageBundle.getMessage("angal.common.user.col").toUpperCase() };
-	private int[] pColumwidth = { 150, 150, 150, 200 };
+	private int[] columwidth = { 150, 150, 150, 200 };
+	private boolean[] columnCentered = { false, true, true, true };
 	private JComboBox<String> statusComboBox;
 	private JLabel statusLabel;
 	JButton next;
@@ -125,7 +128,6 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		panelFooter = getPanelFooter();
 		getContentPane().add(panelFooter, BorderLayout.SOUTH);
 
-		ajustWidth();
 		addWindowListener(new WindowAdapter() {
 
 			public void windowClosing(WindowEvent e) {
@@ -342,7 +344,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			List<MedicalInventory> validatedMedicalInventories = new ArrayList<>();
 			try {
 				draftMedicalInventories = medicalInventoryManager.getMedicalInventoryByStatusAndInventoryType(draft, inventoryType);
-				validatedMedicalInventories =  medicalInventoryManager.getMedicalInventoryByStatusAndInventoryType(validated, inventoryType);
+				validatedMedicalInventories = medicalInventoryManager.getMedicalInventoryByStatusAndInventoryType(validated, inventoryType);
 			} catch (OHServiceException e) {
 				OHServiceExceptionUtil.showMessages(e);
 			}
@@ -378,12 +380,12 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 				MessageDialog.error(null, "angal.inventory.cancelednoteditable.msg");
 				return;
 			}
-			
+
 			if (inventory.getStatus().equals(InventoryStatus.done.toString())) {
 				MessageDialog.error(null, "angal.inventory.donenoteditable.msg");
 				return;
 			}
-			InventoryEdit inventoryEdit = new InventoryEdit(inventory,"update");
+			InventoryEdit inventoryEdit = new InventoryEdit(inventory, "update");
 			InventoryEdit.addInventoryListener(InventoryBrowser.this);
 			inventoryEdit.showAsModal(InventoryBrowser.this);
 		});
@@ -395,22 +397,22 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		jButtonView.setMnemonic(MessageBundle.getMnemonic("angal.common.view.btn.key"));
 		jButtonView.setEnabled(false);
 		jButtonView.addActionListener(actionEvent -> {
-				MedicalInventory inventory = new MedicalInventory();
-				if (jTableInventory.getSelectedRowCount() > 1) {
-					MessageDialog.error(this, "angal.inventory.pleaseselectonlyoneinventory.msg");
-					return;
-				}
-				int selectedRow = jTableInventory.getSelectedRow();
-				if (selectedRow == -1) {
-					MessageDialog.error(this, "angal.inventory.pleaseselectinventory.msg");
-					return;
-				}
-				if(selectedRow > -1) {
-					inventory = inventoryList.get(selectedRow);
-					InventoryEdit inventoryEdit = new InventoryEdit(inventory,"view");
-					InventoryEdit.addInventoryListener(InventoryBrowser.this);
-					inventoryEdit.showAsModal(InventoryBrowser.this);
-				}
+			MedicalInventory inventory = new MedicalInventory();
+			if (jTableInventory.getSelectedRowCount() > 1) {
+				MessageDialog.error(this, "angal.inventory.pleaseselectonlyoneinventory.msg");
+				return;
+			}
+			int selectedRow = jTableInventory.getSelectedRow();
+			if (selectedRow == -1) {
+				MessageDialog.error(this, "angal.inventory.pleaseselectinventory.msg");
+				return;
+			}
+			if (selectedRow > -1) {
+				inventory = inventoryList.get(selectedRow);
+				InventoryEdit inventoryEdit = new InventoryEdit(inventory, "view");
+				InventoryEdit.addInventoryListener(InventoryBrowser.this);
+				inventoryEdit.showAsModal(InventoryBrowser.this);
+			}
 		});
 		return jButtonView;
 	}
@@ -450,8 +452,6 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		return jButtonDelete;
 	}
 
-
-
 	private JButton getCloseButton() {
 		jButtonClose = new JButton(MessageBundle.getMessage("angal.common.close.btn"));
 		jButtonClose.setMnemonic(MessageBundle.getMnemonic("angal.common.close.btn.key"));
@@ -474,6 +474,13 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			jTableInventory = new JTable();
 			jTableInventory.setFillsViewportHeight(true);
 			jTableInventory.setModel(new InventoryBrowsingModel());
+			jTableInventory.setAutoCreateColumnsFromModel(false);
+			for (int i = 0; i < columwidth.length; i++) {
+				jTableInventory.getColumnModel().getColumn(i).setMinWidth(columwidth[i]);
+				if (columnCentered[i]) {
+					jTableInventory.getColumnModel().getColumn(i).setCellRenderer(new CenterTableCellRenderer());
+				}
+			}
 			jTableInventory.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
 				@Override
@@ -483,14 +490,14 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 						if (selectedRows.length == 1) {
 							int selectedRow = jTableInventory.getSelectedRow();
 							MedicalInventory inventory = inventoryList.get(selectedRow);
-							if (inventory.getStatus().equals(InventoryStatus.canceled.toString()) || 
-											inventory.getStatus().equals(InventoryStatus.done.toString())) {
+							if (inventory.getStatus().equals(InventoryStatus.canceled.toString()) ||
+								inventory.getStatus().equals(InventoryStatus.done.toString())) {
 								jButtonEdit.setEnabled(false);
 								jButtonDelete.setEnabled(false);
 							} else {
 								jButtonEdit.setEnabled(true);
 								jButtonDelete.setEnabled(true);
-								
+
 							}
 							jButtonView.setEnabled(true);
 							jButtonView.setEnabled(true);
@@ -507,7 +514,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		}
 		return jTableInventory;
 	}
-	
+
 	class InventoryBrowsingModel extends DefaultTableModel {
 
 		private static final long serialVersionUID = 1L;
@@ -529,7 +536,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			String type = InventoryType.main.toString();
 			try {
 				Page<MedicalInventory> medInventorypage = medicalInventoryManager.getMedicalInventoryByParamsPageable(dateFrom, dateTo, state, type, startIndex,
-								pageSize);
+					pageSize);
 				inventoryList = medInventorypage.getContent();
 			} catch (OHServiceException e) {
 				OHServiceExceptionUtil.showMessages(e);
@@ -557,11 +564,11 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		}
 
 		public String getColumnName(int c) {
-			return pColums[c];
+			return columsNames[c];
 		}
 
 		public int getColumnCount() {
-			return pColums.length;
+			return columsNames.length;
 		}
 
 		public Object getValueAt(int r, int c) {
@@ -590,12 +597,6 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 	public String formatDateTime(GregorianCalendar time) {
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy"); //$NON-NLS-1$
 		return format.format(time.getTime());
-	}
-
-	private void ajustWidth() {
-		for (int i = 0; i < pColumwidth.length; i++) {
-			jTableInventory.getColumnModel().getColumn(i).setMinWidth(pColumwidth[i]);
-		}
 	}
 
 	private JComboBox<String> getComboBox() {
@@ -660,5 +661,18 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 	@Override
 	public void InventoryUpdated(AWTEvent e) {
 		jTableInventory.setModel(new InventoryBrowsingModel());
+	}
+
+	class CenterTableCellRenderer extends DefaultTableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+			Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			setHorizontalAlignment(CENTER);
+			return cell;
+		}
 	}
 }
