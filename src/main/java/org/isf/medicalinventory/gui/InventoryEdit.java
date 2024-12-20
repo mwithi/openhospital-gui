@@ -198,10 +198,10 @@ public class InventoryEdit extends ModalJFrame {
 			MessageBundle.getMessage("angal.inventory.newlot.col").toUpperCase(),
 			MessageBundle.getMessage("angal.wardpharmacy.lotnumber.col").toUpperCase(),
 			MessageBundle.getMessage("angal.medicalstock.duedate.col").toUpperCase(),
-			MessageBundle.getMessage("angal.inventoryrow.theoreticqty.col").toUpperCase(),
+			MessageBundle.getMessage("angal.inventory.theoreticqty.col").toUpperCase(),
 			MessageBundle.getMessage("angal.inventoryrow.realqty.col").toUpperCase(),
-			MessageBundle.getMessage("angal.inventoryrow.unitcost.col").toUpperCase(),
-			MessageBundle.getMessage("angal.inventoryrow.totalcost.col").toUpperCase() };
+			MessageBundle.getMessage("angal.inventory.unitcost.col").toUpperCase(),
+			MessageBundle.getMessage("angal.inventory.totalcost.col").toUpperCase() };
 	private int[] columwidth = { 50, 50, 200, 100, 100, 100, 100, 80, 80, 80 };
 	private boolean[] columnEditable = { false, false, false, false, false, false, false, true, false, false };
 	private boolean[] columnEditableView = { false, false, false, false, false, false, false, false, false, false };
@@ -1226,7 +1226,7 @@ public class InventoryEdit extends ModalJFrame {
 					addMedInRowInInventorySearchList(invRow);
 				}
 			} else {
-				MessageDialog.info(null, "angal.invetory.notdataforthatfilter.msg");
+				MessageDialog.info(null, "angal.inventory.notdataforthatfilter.msg");
 			}
 		}
 
@@ -1237,7 +1237,7 @@ public class InventoryEdit extends ModalJFrame {
 					addMedInRowInInventorySearchList(invRow);
 				}
 			} else {
-				MessageDialog.info(null, "angal.invetory.notdataforthatfilter.msg");
+				MessageDialog.info(null, "angal.inventory.notdataforthatfilter.msg");
 			}
 		}
 
@@ -2182,7 +2182,7 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(medType));
 						}
 						fireInventoryUpdated();
-						MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
+						MessageDialog.info(null, "angal.inventory.tablehasbeenupdated.msg");
 					} else {
 						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
 					}
@@ -2204,7 +2204,7 @@ public class InventoryEdit extends ModalJFrame {
 						}
 						fireInventoryUpdated();
 						if (!inventoryRowList.isEmpty()) {
-							MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
+							MessageDialog.info(null, "angal.inventory.tablehasbeenupdated.msg");
 						}
 					} else {
 						MessageDialog.info(null, "angal.inventory.youhavealreadyaddedallproduct.msg");
@@ -2223,7 +2223,7 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(true, medType));
 							fireInventoryUpdated();
 							if (!inventoryRowList.isEmpty()) {
-								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
+								MessageDialog.info(null, "angal.inventory.tablehasbeenupdated.msg");
 							}
 						}
 					} else {
@@ -2246,7 +2246,7 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(null, true));
 							fireInventoryUpdated();
 							if (!inventoryRowList.isEmpty()) {
-								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
+								MessageDialog.info(null, "angal.inventory.tablehasbeenupdated.msg");
 							}
 						}
 					} else {
@@ -2266,7 +2266,7 @@ public class InventoryEdit extends ModalJFrame {
 							jTableInventoryRow.setModel(new InventoryRowModel(medType, true));
 							fireInventoryUpdated();
 							if (!inventoryRowList.isEmpty()) {
-								MessageDialog.info(null, "angal.invetory.tablehasbeenupdated.msg");
+								MessageDialog.info(null, "angal.inventory.tablehasbeenupdated.msg");
 							}
 						}
 					} else {
