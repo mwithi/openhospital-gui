@@ -1137,7 +1137,7 @@ public class InventoryEdit extends ModalJFrame {
 					jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new CenterTableCellRenderer());
 				}
 				if (columnDecimalNumber[i]) {
-					jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new DeciamlNumberTableCellRenderer());
+					jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new DecimalNumberTableCellRenderer());
 				}
 			}
 			jTableInventoryRow.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -2292,7 +2292,9 @@ public class InventoryEdit extends ModalJFrame {
 		}
 	}
 
-	public class DeciamlNumberTableCellRenderer extends DefaultTableCellRenderer {
+	public class DecimalNumberTableCellRenderer extends DefaultTableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
