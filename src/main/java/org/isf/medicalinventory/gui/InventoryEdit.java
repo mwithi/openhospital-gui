@@ -21,7 +21,7 @@
  */
 package org.isf.medicalinventory.gui;
 
-import static org.isf.utils.Constants.DATE_TIME_FORMATTER;
+import static org.isf.utils.Constants.DATE_FORMATTER;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -207,6 +207,10 @@ public class InventoryEdit extends ModalJFrame {
 	private boolean[] columnEditableView = { false, false, false, false, false, false, false, false, false, false };
 	private boolean[] pColumnVisible = { false, true, true, true, !GeneralData.AUTOMATICLOT_IN, true, true, true, GeneralData.LOTWITHCOST,
 			GeneralData.LOTWITHCOST };
+	private boolean[] columnCentered = { false, false, false, true, true, true, true, true, true, true };
+	private boolean[] columnDecimalNumber = { false, false, false, false, false, false, false, false, true, true };
+	private Class< ? >[] columnsClasses = { String.class, Integer.class, String.class, String.class, String.class, LocalDate.class, Integer.class,
+			Integer.class, BigDecimal.class, BigDecimal.class };
 	private MedicalInventory inventory = null;
 	private JLabel specificRadio;
 	private JLabel dateInventoryLabel;
@@ -1123,17 +1127,19 @@ public class InventoryEdit extends ModalJFrame {
 			jTableInventoryRow.setModel(model);
 			jTableInventoryRow.setAutoCreateColumnsFromModel(false);
 			for (int i = 0; i < pColumnVisible.length; i++) {
-				jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new EnabledTableCellRenderer());
 				jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(pColumwidth[i]);
-				if (i == 0 || !pColumnVisible[i]) {
+				if (!pColumnVisible[i]) {
 					jTableInventoryRow.getColumnModel().getColumn(i).setMinWidth(0);
 					jTableInventoryRow.getColumnModel().getColumn(i).setMaxWidth(0);
 					jTableInventoryRow.getColumnModel().getColumn(i).setPreferredWidth(0);
 				}
+				if (columnCentered[i]) {
+					jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new CenterTableCellRenderer());
+				}
+				if (columnDecimalNumber[i]) {
+					jTableInventoryRow.getColumnModel().getColumn(i).setCellRenderer(new DeciamlNumberTableCellRenderer());
+				}
 			}
-			DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-			centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-			jTableInventoryRow.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
 			jTableInventoryRow.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
 				@Override
@@ -1173,17 +1179,6 @@ public class InventoryEdit extends ModalJFrame {
 			jTableInventoryRow.setDefaultEditor(Integer.class, cellEditor);
 		}
 		return jTableInventoryRow;
-	}
-
-	class EnabledTableCellRenderer extends DefaultTableCellRenderer {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			return cell;
-		}
 	}
 
 	class InventoryRowModel extends DefaultTableModel {
@@ -1247,28 +1242,7 @@ public class InventoryEdit extends ModalJFrame {
 		}
 
 		public Class< ? > getColumnClass(int c) {
-			if (c == 0) {
-				return Integer.class;
-			} else if (c == 1) {
-				return String.class;
-			} else if (c == 2) {
-				return String.class;
-			} else if (c == 3) {
-				return String.class;
-			} else if (c == 4) {
-				return String.class;
-			} else if (c == 5) {
-				return String.class;
-			} else if (c == 6) {
-				return Double.class;
-			} else if (c == 7) {
-				return Double.class;
-			} else if (c == 8) {
-				return BigDecimal.class;
-			} else if (c == 9) {
-				return Double.class;
-			}
-			return null;
+			return columnsClasses[c];
 		}
 
 		public int getRowCount() {
@@ -1310,7 +1284,7 @@ public class InventoryEdit extends ModalJFrame {
 				} else if (c == 5) {
 					if (medInvtRow.getLot() != null) {
 						if (medInvtRow.getLot().getDueDate() != null) {
-							return medInvtRow.getLot().getDueDate().format(DATE_TIME_FORMATTER);
+							return medInvtRow.getLot().getDueDate().format(DATE_FORMATTER);
 						}
 					}
 					return "";
@@ -1323,18 +1297,18 @@ public class InventoryEdit extends ModalJFrame {
 				} else if (c == 8) {
 					if (medInvtRow.getLot() != null) {
 						if (medInvtRow.getLot().getCost() != null) {
-							medInvtRow.setTotal(medInvtRow.getRealQty() * medInvtRow.getLot().getCost().doubleValue());
+							medInvtRow.setTotal(medInvtRow.getLot().getCost().multiply(BigDecimal.valueOf(medInvtRow.getRealQty())));
 							return medInvtRow.getLot().getCost();
 						}
 					}
-					return new BigDecimal("0.00");
+					return BigDecimal.ZERO;
 				} else if (c == 9) {
 					if (medInvtRow.getLot() != null) {
 						if (medInvtRow.getLot().getCost() != null) {
 							return medInvtRow.getTotal();
 						}
 					}
-					return 0.0;
+					return BigDecimal.ZERO;
 				}
 			}
 			return null;
@@ -1360,7 +1334,7 @@ public class InventoryEdit extends ModalJFrame {
 					}
 					invRow.setRealqty(intValue);
 					if (invRow.getLot() != null && invRow.getLot().getCost() != null) {
-						double total = invRow.getRealQty() * invRow.getLot().getCost().doubleValue();
+						BigDecimal total = invRow.getLot().getCost().multiply(BigDecimal.valueOf(invRow.getRealQty()));
 						invRow.setTotal(total);
 					}
 					inventoryRowListAdded.add(invRow);
@@ -1386,10 +1360,10 @@ public class InventoryEdit extends ModalJFrame {
 			LocalDateTime expiringDate = askExpiringDate();
 			lot = new Lot("", preparationDate, expiringDate);
 			// Cost
-			BigDecimal cost = new BigDecimal(0);
+			BigDecimal cost = BigDecimal.ZERO;
 			if (isLotWithCost()) {
 				cost = askCost(2, cost);
-				if (cost.compareTo(new BigDecimal(0)) == 0) {
+				if (cost.compareTo(BigDecimal.ZERO) == 0) {
 					return null;
 				}
 			}
@@ -1443,7 +1417,7 @@ public class InventoryEdit extends ModalJFrame {
 					expiringDate = expireDateChooser.getDateEndOfDay();
 					preparationDate = preparationDateChooser.getDateStartOfDay();
 					lot = new Lot(lotName, preparationDate, expiringDate);
-					BigDecimal cost = new BigDecimal(0);
+					BigDecimal cost = BigDecimal.ZERO;
 					if (isLotWithCost()) {
 						if (lotToUpdate != null) {
 							cost = askCost(2, lotToUpdate.getCost());
@@ -1451,7 +1425,7 @@ public class InventoryEdit extends ModalJFrame {
 							cost = askCost(2, cost);
 						}
 
-						if (cost.compareTo(new BigDecimal(0)) == 0) {
+						if (cost.compareTo(BigDecimal.ZERO) == 0) {
 							return null;
 						} else {
 							lot.setCost(cost);
@@ -2303,5 +2277,33 @@ public class InventoryEdit extends ModalJFrame {
 				}
 			}
 		});
+	}
+
+	class CenterTableCellRenderer extends DefaultTableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+			Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			setHorizontalAlignment(CENTER);
+			return cell;
+		}
+	}
+
+	public class DeciamlNumberTableCellRenderer extends DefaultTableCellRenderer {
+
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+			JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			if (value instanceof BigDecimal) {
+				lbl.setText(String.format("%.02f", value));
+			}
+			lbl.setOpaque(true);
+			lbl.setBackground(Color.WHITE);
+			setHorizontalAlignment(CENTER);
+			return lbl;
+		}
 	}
 }
