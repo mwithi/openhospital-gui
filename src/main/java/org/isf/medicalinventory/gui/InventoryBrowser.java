@@ -25,6 +25,7 @@ import static org.isf.utils.Constants.DATE_TIME_FORMATTER;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -91,9 +92,10 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 	private JButton jButtonView;
 	private JScrollPane scrollPaneInventory;
 	private JTable jTableInventory;
-	private String[] columsNames = { MessageBundle.getMessage("angal.common.reference.label").toUpperCase(),
+	private String[] columsNames = {
+			MessageBundle.getMessage("angal.common.reference.label").toUpperCase(),
 			MessageBundle.getMessage("angal.common.date.txt").toUpperCase(),
-			MessageBundle.getMessage("angal.inventory.status.txt").toUpperCase(),
+			MessageBundle.getMessage("angal.common.status.txt").toUpperCase(),
 			MessageBundle.getMessage("angal.common.user.col").toUpperCase() };
 	private int[] columwidth = { 150, 150, 150, 200 };
 	private boolean[] columnCentered = { false, true, true, true };
@@ -478,7 +480,9 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			for (int i = 0; i < columwidth.length; i++) {
 				jTableInventory.getColumnModel().getColumn(i).setMinWidth(columwidth[i]);
 				if (columnCentered[i]) {
-					jTableInventory.getColumnModel().getColumn(i).setCellRenderer(new CenterTableCellRenderer());
+					jTableInventory.getColumnModel().getColumn(i).setCellRenderer(new ColorCenterTableCellRenderer());
+				} else {
+					jTableInventory.getColumnModel().getColumn(i).setCellRenderer(new ColorTableCellRenderer());
 				}
 			}
 			jTableInventory.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -626,7 +630,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 
 	private JLabel getStatusLabel() {
 		if (statusLabel == null) {
-			statusLabel = new JLabel(MessageBundle.getMessage("angal.inventory.status.txt"));
+			statusLabel = new JLabel(MessageBundle.getMessage("angal.inventory.status.label"));
 			statusLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		}
 		return statusLabel;
@@ -663,7 +667,20 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		jTableInventory.setModel(new InventoryBrowsingModel());
 	}
 
-	class CenterTableCellRenderer extends DefaultTableCellRenderer {
+	class ColorTableCellRenderer extends DefaultTableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+			Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			formatCellByBillStatus(table, row, cell);
+			return cell;
+		}
+	}
+
+	class ColorCenterTableCellRenderer extends DefaultTableCellRenderer {
 
 		private static final long serialVersionUID = 1L;
 
@@ -672,7 +689,17 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 
 			Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			setHorizontalAlignment(CENTER);
+			formatCellByBillStatus(table, row, cell);
 			return cell;
+		}
+	}
+
+	private void formatCellByBillStatus(JTable table, int row, Component cell) {
+		int statusColumn = table.getColumnModel().getColumnIndex(MessageBundle.getMessage("angal.common.status.txt").toUpperCase());
+		if ((table.getValueAt(row, statusColumn)).equals(InventoryStatus.draft.toString())) {
+			cell.setForeground(Color.BLUE);
+		} else {
+			cell.setForeground(Color.BLACK);
 		}
 	}
 }
