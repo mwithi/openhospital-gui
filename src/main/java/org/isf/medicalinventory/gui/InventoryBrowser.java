@@ -238,6 +238,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		}
 		return panelHeader;
 	}
+
 	private JPanel getPanelContent() {
 		if (panelContent == null) {
 			panelContent = new JPanel();
@@ -255,6 +256,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		}
 		return panelContent;
 	}
+
 	private JPanel getPanelFooter() {
 		if (panelFooter == null) {
 			panelFooter = new JPanel();
@@ -277,6 +279,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 		initialisePagesCombo(totalRows);
 		return panelFooter;
 	}
+
 	private GoodDateChooser getJCalendarTo() {
 		if (jCalendarTo == null) {
 			jCalendarTo = new GoodDateChooser(LocalDate.now(), false, false);
