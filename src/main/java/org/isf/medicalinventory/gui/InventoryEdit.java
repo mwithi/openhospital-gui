@@ -926,7 +926,7 @@ public class InventoryEdit extends ModalJFrame {
 				}
 			}
 			if (!mode.equals("new") && inventoryRowSearchList.isEmpty()) {
-				MessageDialog.info(null, "angal.inventoryrow.pleaseinsertatleastoneinventoryrow.msg");
+				MessageDialog.error(null, "angal.inventoryrow.pleaseinsertatleastoneinventoryrow.msg");
 			} else {
 				resetVariable();
 				dispose();
@@ -958,14 +958,8 @@ public class InventoryEdit extends ModalJFrame {
 		resetButton.addActionListener(actionEvent -> {
 			int reset = MessageDialog.yesNo(null, "angal.inventoryrow.doyoureallywanttocleanthistable.msg");
 			if (reset == JOptionPane.YES_OPTION) {
-				try {
-					if (inventory != null) {
-						List<MedicalInventoryRow> invRows = medicalInventoryRowManager.getMedicalInventoryRowByInventoryId(inventory.getId());
-						medicalInventoryRowManager.deleteMedicalInventoryRows(invRows);
-					}
-
-				} catch (OHServiceException e) {
-					OHServiceExceptionUtil.showMessages(e);
+				if (inventory != null) {
+					inventoryRowsToDelete.addAll(inventoryRowSearchList);
 				}
 				inventoryRowSearchList.clear();
 				DefaultTableModel model = (DefaultTableModel) jTableInventoryRow.getModel();
