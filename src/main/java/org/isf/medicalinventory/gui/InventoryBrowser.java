@@ -636,7 +636,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			pagesComboBox.addItem(i);
 		}
 
-		ofPagesLabel.setText("/" + totalPages + " " + MessageBundle.getMessage("angal.common.pages.txt"));
+		ofPagesLabel.setText(MessageBundle.formatMessage("angal.common.pages.fmt.txt", totalPages));
 	}
 
 	@Override
