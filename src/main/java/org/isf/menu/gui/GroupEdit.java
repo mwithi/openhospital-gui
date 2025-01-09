@@ -187,7 +187,7 @@ public class GroupEdit extends JDialog {
 			okButton.setMnemonic(MessageBundle.getMnemonic("angal.common.ok.btn.key"));
 			okButton.addActionListener(actionEvent -> {
 				if (nameTextField.getText().isEmpty()) {
-					MessageDialog.error(null, MessageBundle.getMessage("angal.groupsbrowser.pleaseinsertavalidusergroupname.msg"));
+					MessageDialog.error(null, "angal.groupsbrowser.pleaseinsertavalidusergroupname.msg");
 					return;
 				}
 
