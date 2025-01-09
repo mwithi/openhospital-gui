@@ -924,12 +924,9 @@ public class InventoryEdit extends ModalJFrame {
 				if (reset == JOptionPane.YES_OPTION) {
 					this.saveButton.doClick();
 				}
-				if (inventoryRowSearchList.isEmpty()) {
-					MessageDialog.info(null, "angal.inventoryrow.pleaseinsertatleastoneinventoryrow.msg");
-				} else {
-					resetVariable();
-					dispose();
-				}
+			}
+			if (!mode.equals("new") && inventoryRowSearchList.isEmpty()) {
+				MessageDialog.info(null, "angal.inventoryrow.pleaseinsertatleastoneinventoryrow.msg");
 			} else {
 				resetVariable();
 				dispose();
@@ -1385,6 +1382,7 @@ public class InventoryEdit extends ModalJFrame {
 					SwingUtilities.invokeLater(() -> {
 						jTableInventoryRow.updateUI();
 					});
+					validateButton.setEnabled(false);
 				}
 			}
 
