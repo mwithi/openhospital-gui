@@ -211,12 +211,12 @@ public class InventoryEdit extends ModalJFrame {
 	private boolean[] columnDecimalNumber = { false, false, false, false, false, false, false, false, true, true };
 	private Class< ? >[] columnsClasses = { String.class, Integer.class, String.class, String.class, String.class, LocalDate.class, Integer.class,
 			Integer.class, BigDecimal.class, BigDecimal.class };
-	private MedicalInventory inventory = null;
+	private MedicalInventory inventory;
 	private JLabel specificRadio;
 	private JLabel dateInventoryLabel;
 	private JTextField codeTextField;
-	private String code = null;
-	private String mode = null;
+	private String code;
+	private String mode;
 	private JLabel referenceLabel;
 	private JLabel statusLabel;
 	private JLabel chargeTypeLabel;
@@ -230,11 +230,11 @@ public class InventoryEdit extends ModalJFrame {
 	private JComboBox<MovementType> dischargeCombo;
 	private JComboBox<Supplier> supplierCombo;
 	private JComboBox<Ward> destinationCombo;
-	private MovementType chargeType = null;
-	private MovementType dischargeType = null;
-	private Supplier supplier = null;
-	private Ward destination = null;
-	private String newReference = null;
+	private MovementType chargeType;
+	private MovementType dischargeType;
+	private Supplier supplier;
+	private Ward destination;
+	private String newReference;
 	private JButton selectButton;
 	private JFrame frame;
 	private JPanel mainPanel;
