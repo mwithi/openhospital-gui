@@ -605,7 +605,7 @@ public class InventoryBrowser extends ModalJFrame implements InventoryListener {
 			statusComboBox.addActionListener(actionEvent -> {
 				totalRows = medicalInventoryManager.getInventoryCount(InventoryType.main.toString());
 				startIndex = 0;
-				int page = startIndex / PAGE_SIZE + 1;
+				int page = 1;
 				previous.setEnabled(false);
 				if (totalRows <= PAGE_SIZE) {
 					next.setEnabled(false);
