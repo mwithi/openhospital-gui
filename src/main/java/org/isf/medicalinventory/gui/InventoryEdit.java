@@ -783,7 +783,9 @@ public class InventoryEdit extends ModalJFrame {
 		                }
 					}
 				}
-				inventoryRowSearchList = newMedicalInventoryRows;
+				if (!newMedicalInventoryRows.isEmpty()) {
+					inventoryRowSearchList = newMedicalInventoryRows;
+				}
 				jTableInventoryRow.updateUI();
 			} catch (OHServiceException e) {
 				OHServiceExceptionUtil.showMessages(e);
@@ -934,9 +936,15 @@ public class InventoryEdit extends ModalJFrame {
 				lastDate = inventory.getInventoryDate();
 			}
 			if (checkParameters(lastDestination, lastCharge, lastDischarge, lastSupplier, lastReference, lastDate)) {
-				int reset = MessageDialog.yesNo(null, "angal.inventoryrow.doyouwanttosavethechanges.msg");
+				int reset = MessageDialog.yesNoCancel(null, "angal.inventoryrow.doyouwanttosavethechanges.msg");
 				if (reset == JOptionPane.YES_OPTION) {
 					this.saveButton.doClick();
+					return;
+				}
+				if (reset == JOptionPane.NO_OPTION) {
+					resetVariable();
+					dispose();
+				} else {
 					return;
 				}
 			}
