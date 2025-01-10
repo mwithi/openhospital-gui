@@ -777,6 +777,9 @@ public class InventoryEdit extends ModalJFrame {
 						resetVariable();
 						fireInventoryUpdated();
 						validateButton.setEnabled(true);
+						if (confirmButton.isEnabled()) {
+							confirmButton.setEnabled(false);
+						}
 						int info = MessageDialog.yesNo(null, "angal.inventory.doyouwanttocontinueediting.msg");
 						if (info != JOptionPane.YES_OPTION) {
 							dispose();
@@ -947,9 +950,6 @@ public class InventoryEdit extends ModalJFrame {
 				} else {
 					return;
 				}
-			}
-			if (!mode.equals("new") && inventoryRowSearchList.isEmpty()) {
-				MessageDialog.error(null, "angal.inventoryrow.pleaseinsertatleastoneinventoryrow.msg");
 			} else {
 				resetVariable();
 				dispose();
@@ -1018,11 +1018,6 @@ public class InventoryEdit extends ModalJFrame {
 				String wardCode = inventory.getDestination();
 				String lastReference = inventory.getInventoryReference();
 				LocalDateTime lastDate = inventory.getInventoryDate();
-				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate) || !lotsSaved.isEmpty()
-					|| !inventoryRowListAdded.isEmpty() || !inventoryRowsToDelete.isEmpty()) {
-					MessageDialog.error(null, "angal.inventory.pleasesaveinventorybeforevalidateit.msg");
-                    return;
-				}
 				List<MedicalInventoryRow> invRowWithoutRealQty = inventoryRowSearchList.stream().filter(invRow -> invRow.getRealQty() == 0 && invRow.isNewLot()).collect(Collectors.toList());
 				if (!invRowWithoutRealQty.isEmpty()) {
 					MessageDialog.error(null, "angal.inventory.allinventoryrowswithnewlotshouldhaverealqtygreatterthanzero.msg");
@@ -1032,6 +1027,10 @@ public class InventoryEdit extends ModalJFrame {
 				if (errorMessage != null) {
 					MessageDialog.error(null, errorMessage);
 					return;
+				}
+				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate)) {
+					MessageDialog.error(null, "angal.inventory.pleasesaveinventorybeforevalidateit.msg");
+                    return;
 				}
 				// validate inventory
 				try {
@@ -2087,18 +2086,24 @@ public class InventoryEdit extends ModalJFrame {
 		lotsSaved.clear();
 	}
 
-	private boolean checkParameters(String wardCode, String chargeCode, String dischargeCode, Integer suplierId, String reference, LocalDateTime date) {
-		if (!lotsSaved.isEmpty() || !inventoryRowListAdded.isEmpty() || !lotsDeleted.isEmpty() || !inventoryRowsToDelete.isEmpty()
-			|| (destination != null && !destination.getCode().equals(wardCode))
-			|| (chargeType != null && !chargeType.getCode().equals(chargeCode))
-			|| (dischargeType != null && !dischargeType.getCode().equals(dischargeCode))
-			|| (supplier != null && supplier.getSupId() != suplierId) || (destination == null && wardCode != null)
-			|| (chargeType == null && chargeCode != null) || (dischargeType == null && dischargeCode != null)
-			|| (supplier == null && suplierId != null) || (reference != null && !reference.equals(newReference))
-			|| !date.toLocalDate().equals(dateInventory.toLocalDate())) {
-			return true;
-		}
-		return false;
+	private boolean checkParameters(String wardCode, String chargeCode, String dischargeCode, Integer supplierId, String reference, LocalDateTime date) {
+	    return !lotsSaved.isEmpty()
+	            || !inventoryRowListAdded.isEmpty()
+	            || !lotsDeleted.isEmpty()
+	            || !inventoryRowsToDelete.isEmpty()
+	            || (destination != null && isMismatch(destination.getCode(), wardCode))
+	            || (chargeType != null && isMismatch(chargeType.getCode(), chargeCode))
+	            || (dischargeType != null && isMismatch(dischargeType.getCode(), dischargeCode))
+	            || (supplier != null && supplier.getSupId() != supplierId)
+	            || !isSameDate(date, dateInventory);
+	}
+	
+	private boolean isMismatch(String value, String expectedValue) {
+	    return !value.equals(expectedValue);
+	}
+
+	private boolean isSameDate(LocalDateTime date1, LocalDateTime date2) {
+	    return date1.toLocalDate().equals(date2.toLocalDate());
 	}
 
 	private JComboBox<MedicalType> getJComboMedicalType() {
