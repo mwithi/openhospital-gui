@@ -990,7 +990,7 @@ public class InventoryEdit extends ModalJFrame {
 			}
 			List<MedicalInventoryRow> invRowWithoutRealQty = inventoryRowSearchList.stream().filter(invRow -> invRow.getRealQty() == 0 && invRow.isNewLot()).collect(Collectors.toList());
 			if (!invRowWithoutRealQty.isEmpty()) {
-				MessageDialog.error(null, "angal.inventory.allinventoryrowshouldhaverealqtygreatterthanzero.msg");
+				MessageDialog.error(null, "angal.inventory.allinventoryrowswithnewlotshouldhaverealqtygreatterthanzero.msg");
 				return;
 			}
 			int reset = MessageDialog.yesNo(null, "angal.inventoryrow.doyoureallywanttovalidatethisinventory.msg");
