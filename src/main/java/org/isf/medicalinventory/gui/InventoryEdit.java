@@ -996,6 +996,10 @@ public class InventoryEdit extends ModalJFrame {
 			}
 			int reset = MessageDialog.yesNo(null, "angal.inventoryrow.doyoureallywanttovalidatethisinventory.msg");
 			if (reset == JOptionPane.YES_OPTION) {
+				if (inventoryRowSearchList == null || inventoryRowSearchList.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.cannotvalidateinventorywithoutproducts.msg");
+					return;
+				}
 				String chargeCode = inventory.getChargeType();
 				String dischargeCode = inventory.getDischargeType();
 				Integer supplierId = inventory.getSupplier();
@@ -1068,6 +1072,10 @@ public class InventoryEdit extends ModalJFrame {
 			}
 			int confirm = MessageDialog.yesNo(null, "angal.inventory.doyoureallywanttoconfirmthisinventory.msg");
 			if (confirm == JOptionPane.YES_OPTION) {
+				if (inventoryRowSearchList == null || inventoryRowSearchList.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.cannotconfirminventorywithoutproducts.msg");
+					return;
+				}
 				String dischargeCode = inventory.getDischargeType();
 				String chargeCode = inventory.getChargeType();
 				Integer supplierId = inventory.getSupplier();

@@ -59,13 +59,17 @@ import org.isf.patient.gui.SelectPatient;
 import org.isf.patient.model.Patient;
 import org.isf.serviceprinting.manager.PrintLabels;
 import org.isf.serviceprinting.manager.PrintManager;
+import org.isf.utils.exception.OHException;
 import org.isf.utils.exception.OHServiceException;
 import org.isf.utils.exception.gui.OHServiceExceptionUtil;
+import org.isf.utils.exception.model.OHExceptionMessage;
 import org.isf.utils.jobjects.GoodDateChooser;
 import org.isf.utils.jobjects.MessageDialog;
 import org.isf.utils.jobjects.ModalJFrame;
 import org.isf.utils.layout.SpringUtilities;
 import org.isf.utils.time.TimeTools;
+
+import net.sf.jasperreports.engine.JRException;
 
 /**
  * LabBrowser - list all labs
@@ -231,8 +235,10 @@ public class LabBrowser extends ModalJFrame implements LabListener, LabEditListe
 				}
 				try {
 					new PrintLabels("LabelForSamples", patId);
-				} catch (OHServiceException e) {
-					OHServiceExceptionUtil.showMessages(e);
+				} catch (OHException e) {
+					OHServiceExceptionUtil.showMessages(new OHServiceException(new OHExceptionMessage(e.getMessage())));
+				} catch (JRException e) {
+					OHServiceExceptionUtil.showMessages(new OHServiceException(new OHExceptionMessage(MessageBundle.getMessage("angal.lab.noprinter.msg"))));
 				}
 
 			});
