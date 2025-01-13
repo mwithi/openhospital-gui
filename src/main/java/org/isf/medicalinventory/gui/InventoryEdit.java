@@ -926,7 +926,7 @@ public class InventoryEdit extends ModalJFrame {
 				int reset = MessageDialog.yesNoCancel(null, "angal.inventoryrow.doyouwanttosavethechanges.msg");
 				if (reset == JOptionPane.YES_OPTION) {
 					this.saveButton.doClick();
-					return;
+					dispose();
 				}
 				if (reset == JOptionPane.NO_OPTION) {
 					resetVariable();
