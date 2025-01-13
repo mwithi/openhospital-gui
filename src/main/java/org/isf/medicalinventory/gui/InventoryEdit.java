@@ -649,10 +649,6 @@ public class InventoryEdit extends ModalJFrame {
 					fireInventoryInserted();
 					validateButton.setEnabled(true);
 					resetVariable();
-					int info = MessageDialog.yesNo(null, "angal.inventory.doyouwanttocontinueediting.msg");
-					if (info != JOptionPane.YES_OPTION) {
-						dispose();
-	                }
 				} else if (mode.equals("update")) {
 					String lastCharge = inventory.getChargeType();
 					String lastDischarge = inventory.getDischargeType();
@@ -700,10 +696,6 @@ public class InventoryEdit extends ModalJFrame {
 										confirmButton.setEnabled(false);
 									}
 									resetVariable();
-									int info = MessageDialog.yesNo(null, "angal.inventory.doyouwanttocontinueediting.msg");
-									if (info != JOptionPane.YES_OPTION) {
-										dispose();
-					                }
 								} else {
 									MessageDialog.error(null, "angal.inventory.update.error.msg");
 									return;
@@ -720,10 +712,6 @@ public class InventoryEdit extends ModalJFrame {
 									confirmButton.setEnabled(false);
 								}
 								resetVariable();
-								int info = MessageDialog.yesNo(null, "angal.inventory.doyouwanttocontinueediting.msg");
-								if (info != JOptionPane.YES_OPTION) {
-									dispose();
-				                }
 							} else {
 								MessageDialog.info(null, "angal.inventory.nothinghasbeenaddedonthisinventory.msg");
 							}
@@ -780,10 +768,6 @@ public class InventoryEdit extends ModalJFrame {
 						if (confirmButton.isEnabled()) {
 							confirmButton.setEnabled(false);
 						}
-						int info = MessageDialog.yesNo(null, "angal.inventory.doyouwanttocontinueediting.msg");
-						if (info != JOptionPane.YES_OPTION) {
-							dispose();
-		                }
 					}
 				}
 				if (!newMedicalInventoryRows.isEmpty()) {
