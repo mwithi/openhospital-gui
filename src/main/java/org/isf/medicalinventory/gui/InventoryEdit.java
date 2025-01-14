@@ -1050,6 +1050,16 @@ public class InventoryEdit extends ModalJFrame {
 						} catch (OHServiceException e1) {
 							OHServiceExceptionUtil.showMessages(e1);
 						}
+					} else {
+						try {
+							inventory.setStatus(InventoryStatus.draft.toString());
+	                        statusLabel.setText(InventoryStatus.draft.toString().toUpperCase());
+	                        statusLabel.setForeground(Color.GRAY);
+	                        inventory = medicalInventoryManager.updateMedicalInventory(inventory, true);
+	                        fireInventoryUpdated();
+						} catch (OHServiceException ex) {
+							OHServiceExceptionUtil.showMessages(ex);
+						}
 					}
 				}
 			}
