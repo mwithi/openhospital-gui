@@ -1,6 +1,6 @@
 /*
  * Open Hospital (www.open-hospital.org)
- * Copyright © 2006-2024 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
+ * Copyright © 2006-2025 Informatici Senza Frontiere (info@informaticisenzafrontiere.org)
  *
  * Open Hospital is a free and open source software for healthcare data management.
  *
@@ -325,6 +325,9 @@ public class InventoryEdit extends ModalJFrame {
 			destinationCombo.setEnabled(false);
 			lotButton.setVisible(false);
 			printButton.setVisible(true);
+			selectButton.setEnabled(false);
+			codeTextField.setEnabled(false);
+			
 		} else {
 			saveButton.setVisible(true);
 			validateButton.setVisible(true);
@@ -558,7 +561,16 @@ public class InventoryEdit extends ModalJFrame {
 				frame.setSize(450, 200);
 				frame.setTitle(MessageBundle.getMessage("angal.inventoryrow.lotinformation.title"));
 				frame.setLocationRelativeTo(null);
-				frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+				frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+				frame.addWindowListener(new WindowAdapter() {
+				    @Override
+				    public void windowClosing(WindowEvent e) {
+				        int choice = MessageDialog.yesNo(frame, "angal.inventory.areyousureyouwantoclosethiswindow.msg");
+				        if (choice == JOptionPane.YES_OPTION) {
+				            frame.dispose();
+				        }
+				    }
+				});
 				frame.setVisible(true);
 			});
 		}
@@ -731,7 +743,7 @@ public class InventoryEdit extends ModalJFrame {
 								} else {
 									int idInvRow = medicalInventoryRow.getId();
 									MedicalInventoryRow invRow = medicalInventoryRowManager.getMedicalInventoryRowById(idInvRow);
-									if (invRow.getLock() != medicalInventoryRow.getLock()) {
+									if (invRow != null && invRow.getLock() != medicalInventoryRow.getLock()) {
 										Lot newLot = movStockInsertingManager.storeLot(lotCode, lot, medical);
 										invRow.setLot(newLot);
 										invRow.setNewLot(true);
@@ -760,9 +772,14 @@ public class InventoryEdit extends ModalJFrame {
 						resetVariable();
 						fireInventoryUpdated();
 						validateButton.setEnabled(true);
+						if (confirmButton.isEnabled()) {
+							confirmButton.setEnabled(false);
+						}
 					}
 				}
-				inventoryRowSearchList = newMedicalInventoryRows;
+				if (!newMedicalInventoryRows.isEmpty()) {
+					inventoryRowSearchList = newMedicalInventoryRows;
+				}
 				jTableInventoryRow.updateUI();
 			} catch (OHServiceException e) {
 				OHServiceExceptionUtil.showMessages(e);
@@ -916,9 +933,13 @@ public class InventoryEdit extends ModalJFrame {
 				int reset = MessageDialog.yesNoCancel(null, "angal.inventoryrow.doyouwanttosavethechanges.msg");
 				if (reset == JOptionPane.YES_OPTION) {
 					this.saveButton.doClick();
-				} else {
+					dispose();
+				}
+				if (reset == JOptionPane.NO_OPTION) {
 					resetVariable();
 					dispose();
+				} else {
+					return;
 				}
 			} else {
 				resetVariable();
@@ -951,14 +972,8 @@ public class InventoryEdit extends ModalJFrame {
 		resetButton.addActionListener(actionEvent -> {
 			int reset = MessageDialog.yesNo(null, "angal.inventoryrow.doyoureallywanttocleanthistable.msg");
 			if (reset == JOptionPane.YES_OPTION) {
-				try {
-					if (inventory != null) {
-						List<MedicalInventoryRow> invRows = medicalInventoryRowManager.getMedicalInventoryRowByInventoryId(inventory.getId());
-						medicalInventoryRowManager.deleteMedicalInventoryRows(invRows);
-					}
-
-				} catch (OHServiceException e) {
-					OHServiceExceptionUtil.showMessages(e);
+				if (inventory != null) {
+					inventoryRowsToDelete.addAll(inventoryRowSearchList);
 				}
 				inventoryRowSearchList.clear();
 				DefaultTableModel model = (DefaultTableModel) jTableInventoryRow.getModel();
@@ -988,26 +1003,29 @@ public class InventoryEdit extends ModalJFrame {
 			}
 			int reset = MessageDialog.yesNo(null, "angal.inventoryrow.doyoureallywanttovalidatethisinventory.msg");
 			if (reset == JOptionPane.YES_OPTION) {
+				if (inventoryRowSearchList == null || inventoryRowSearchList.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.cannotvalidateinventorywithoutproducts.msg");
+					return;
+				}
 				String chargeCode = inventory.getChargeType();
 				String dischargeCode = inventory.getDischargeType();
 				Integer supplierId = inventory.getSupplier();
 				String wardCode = inventory.getDestination();
 				String lastReference = inventory.getInventoryReference();
 				LocalDateTime lastDate = inventory.getInventoryDate();
-				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate) || !lotsSaved.isEmpty()
-					|| !inventoryRowListAdded.isEmpty() || !inventoryRowsToDelete.isEmpty()) {
-					saveButton.doClick();
-					chargeCode = inventory.getChargeType();
-					dischargeCode = inventory.getDischargeType();
-					supplierId = inventory.getSupplier();
-					wardCode = inventory.getDestination();
-					lastReference = inventory.getInventoryReference();
-					lastDate = inventory.getInventoryDate();
+				List<MedicalInventoryRow> invRowWithoutRealQty = inventoryRowSearchList.stream().filter(invRow -> invRow.getRealQty() == 0 && invRow.isNewLot()).collect(Collectors.toList());
+				if (!invRowWithoutRealQty.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.allinventoryrowswithnewlotshouldhaverealqtygreatterthanzero.msg");
+					return;
 				}
 				String errorMessage = this.checkParamsValues(chargeCode, dischargeCode, supplierId, wardCode);
 				if (errorMessage != null) {
 					MessageDialog.error(null, errorMessage);
 					return;
+				}
+				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate)) {
+					MessageDialog.error(null, "angal.inventory.pleasesaveinventorybeforevalidateit.msg");
+                    return;
 				}
 				// validate inventory
 				try {
@@ -1036,6 +1054,16 @@ public class InventoryEdit extends ModalJFrame {
 						} catch (OHServiceException e1) {
 							OHServiceExceptionUtil.showMessages(e1);
 						}
+					} else {
+						try {
+							inventory.setStatus(InventoryStatus.draft.toString());
+	                        statusLabel.setText(InventoryStatus.draft.toString().toUpperCase());
+	                        statusLabel.setForeground(Color.GRAY);
+	                        inventory = medicalInventoryManager.updateMedicalInventory(inventory, true);
+	                        fireInventoryUpdated();
+						} catch (OHServiceException ex) {
+							OHServiceExceptionUtil.showMessages(ex);
+						}
 					}
 				}
 			}
@@ -1061,14 +1089,29 @@ public class InventoryEdit extends ModalJFrame {
 			}
 			int confirm = MessageDialog.yesNo(null, "angal.inventory.doyoureallywanttoconfirmthisinventory.msg");
 			if (confirm == JOptionPane.YES_OPTION) {
+				if (inventoryRowSearchList == null || inventoryRowSearchList.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.cannotconfirminventorywithoutproducts.msg");
+					return;
+				}
 				String dischargeCode = inventory.getDischargeType();
 				String chargeCode = inventory.getChargeType();
 				Integer supplierId = inventory.getSupplier();
 				String wardCode = inventory.getDestination();
+				String lastReference = inventory.getInventoryReference();
+				LocalDateTime lastDate = inventory.getInventoryDate();
+				List<MedicalInventoryRow> invRowWithoutRealQty = inventoryRowSearchList.stream().filter(invRow -> invRow.getRealQty() == 0 && invRow.isNewLot()).collect(Collectors.toList());
+				if (!invRowWithoutRealQty.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.allinventoryrowswithnewlotshouldhaverealqtygreatterthanzero.msg");
+					return;
+				}
 				String errorMessage = this.checkParamsValues(chargeCode, dischargeCode, supplierId, wardCode);
 				if (errorMessage != null) {
 					MessageDialog.error(null, errorMessage);
 					return;
+				}
+				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate)) {
+					MessageDialog.error(null, "angal.inventory.pleasesaveinventorybeforeconfirmation.msg");
+                    return;
 				}
 				// confirm inventory
 				try {
@@ -2033,18 +2076,24 @@ public class InventoryEdit extends ModalJFrame {
 		lotsSaved.clear();
 	}
 
-	private boolean checkParameters(String wardCode, String chargeCode, String dischargeCode, Integer suplierId, String reference, LocalDateTime date) {
-		if (!lotsSaved.isEmpty() || !inventoryRowListAdded.isEmpty() || !lotsDeleted.isEmpty() || !inventoryRowsToDelete.isEmpty()
-			|| (destination != null && !destination.getCode().equals(wardCode))
-			|| (chargeType != null && !chargeType.getCode().equals(chargeCode))
-			|| (dischargeType != null && !dischargeType.getCode().equals(dischargeCode))
-			|| (supplier != null && supplier.getSupId() != suplierId) || (destination == null && wardCode != null)
-			|| (chargeType == null && chargeCode != null) || (dischargeType == null && dischargeCode != null)
-			|| (supplier == null && suplierId != null) || (reference != null && !reference.equals(newReference))
-			|| !date.toLocalDate().equals(dateInventory.toLocalDate())) {
-			return true;
-		}
-		return false;
+	private boolean checkParameters(String wardCode, String chargeCode, String dischargeCode, Integer supplierId, String reference, LocalDateTime date) {
+	    return !lotsSaved.isEmpty()
+	            || !inventoryRowListAdded.isEmpty()
+	            || !lotsDeleted.isEmpty()
+	            || !inventoryRowsToDelete.isEmpty()
+	            || (destination != null && isMismatch(destination.getCode(), wardCode))
+	            || (chargeType != null && isMismatch(chargeType.getCode(), chargeCode))
+	            || (dischargeType != null && isMismatch(dischargeType.getCode(), dischargeCode))
+	            || (supplier != null && supplier.getSupId() != supplierId)
+	            || !isSameDate(date, dateInventory);
+	}
+	
+	private boolean isMismatch(String value, String expectedValue) {
+	    return !value.equals(expectedValue);
+	}
+
+	private boolean isSameDate(LocalDateTime date1, LocalDateTime date2) {
+	    return date1.toLocalDate().equals(date2.toLocalDate());
 	}
 
 	private JComboBox<MedicalType> getJComboMedicalType() {
