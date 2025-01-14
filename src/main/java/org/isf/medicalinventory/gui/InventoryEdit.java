@@ -1083,10 +1083,21 @@ public class InventoryEdit extends ModalJFrame {
 				String chargeCode = inventory.getChargeType();
 				Integer supplierId = inventory.getSupplier();
 				String wardCode = inventory.getDestination();
+				String lastReference = inventory.getInventoryReference();
+				LocalDateTime lastDate = inventory.getInventoryDate();
+				List<MedicalInventoryRow> invRowWithoutRealQty = inventoryRowSearchList.stream().filter(invRow -> invRow.getRealQty() == 0 && invRow.isNewLot()).collect(Collectors.toList());
+				if (!invRowWithoutRealQty.isEmpty()) {
+					MessageDialog.error(null, "angal.inventory.allinventoryrowswithnewlotshouldhaverealqtygreatterthanzero.msg");
+					return;
+				}
 				String errorMessage = this.checkParamsValues(chargeCode, dischargeCode, supplierId, wardCode);
 				if (errorMessage != null) {
 					MessageDialog.error(null, errorMessage);
 					return;
+				}
+				if (checkParameters(wardCode, chargeCode, dischargeCode, supplierId, lastReference, lastDate)) {
+					MessageDialog.error(null, "angal.inventory.pleasesaveinventorybeforeconfirmation.msg");
+                    return;
 				}
 				// confirm inventory
 				try {
