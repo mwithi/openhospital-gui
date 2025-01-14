@@ -321,6 +321,9 @@ public class InventoryEdit extends ModalJFrame {
 			destinationCombo.setEnabled(false);
 			lotButton.setVisible(false);
 			printButton.setVisible(true);
+			selectButton.setEnabled(false);
+			codeTextField.setEnabled(false);
+			
 		} else {
 			saveButton.setVisible(true);
 			validateButton.setVisible(true);
